@@ -1,0 +1,24 @@
+# Django - Compatible Python 3.13
+Django==5.1.5
+djangorestframework==3.15.2
+django-cors-headers==4.6.0
+
+# Authentication
+djangorestframework-simplejwt==5.4.0
+
+# Database
+psycopg2-binary==2.9.10
+
+# Environment variables
+python-decouple==3.8
+
+# File uploads & storage
+Pillow==11.1.0
+django-storages==1.14.4
+boto3==1.35.94
+
+# API documentation
+drf-spectacular==0.28.0
+
+# Utilities
+python-slugify==8.0.4
