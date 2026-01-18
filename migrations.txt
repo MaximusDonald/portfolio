@@ -1,0 +1,24 @@
+# Supprimer les anciennes migrations accounts si elles existent
+Remove-Item -Recurse -Force apps\accounts\migrations\
+
+# Recréer le dossier migrations
+New-Item -ItemType Directory -Path apps\accounts\migrations
+New-Item -ItemType File -Path apps\accounts\migrations\__init__.py
+
+# Créer les migrations
+python manage.py makemigrations accounts
+
+# Appliquer les migrations
+python manage.py migrate
+```
+
+Tu devrais voir :
+```
+Migrations for 'accounts':
+  apps\accounts\migrations\0001_initial.py
+    - Create model User
+Running migrations:
+  Applying accounts.0001_initial... OK
+  Applying token_blacklist.0001_initial... OK
+  Applying token_blacklist.0002_outstandingtoken_jti_hex... OK
+  ...

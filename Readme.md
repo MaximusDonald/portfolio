@@ -308,3 +308,29 @@ apps/proofs/
 └── migrations/
     └── __init__.py
 
+
+
+
+🔗 APP recruiter_access - LIENS RECRUTEUR TEMPORAIRES
+
+La dernière app : recruiter_access gère les liens temporaires sécurisés pour les recruteurs.
+
+📚 RÔLE DE L'APP recruiter_access
+L'app recruiter_access gère :
+
+Génération de liens sécurisés avec tokens uniques
+Expiration temporaire (durée configurable)
+Révocation manuelle des liens
+Validation côté backend des tokens
+Tracking des accès (optionnel)
+📁 STRUCTURE DE L'APP recruiter_accessapps/recruiter_access/
+├── __init__.py
+├── apps.py
+├── models.py              # RecruiterLink
+├── serializers.py         # Serializers
+├── views.py               # Generate/Revoke views
+├── urls.py                # Recruiter endpoints
+├── admin.py               # Admin configuration
+├── utils.py               # Token validation
+└── migrations/
+    └── __init__.py

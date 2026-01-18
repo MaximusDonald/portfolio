@@ -23,6 +23,7 @@ urlpatterns = [
     path('api/projects/', include('apps.projects.urls')),
     path('api/skills/', include('apps.skills.urls')),
     path('api/proofs/', include('apps.proofs.urls')),
+    path('api/recruiter-access/', include('apps.recruiter_access.urls')),
 ]
 
 # Serve media files in development
