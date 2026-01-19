@@ -3,6 +3,7 @@ Serializers for Profile model
 """
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
+from typing import Optional
 
 from apps.core.serializers import BaseSerializer
 from .models import Profile
@@ -122,19 +123,19 @@ class PublicProfileSerializer(serializers.ModelSerializer):
             'availability_date',
         ]
     
-    def get_email(self, obj):
+    def get_email(self, obj: Profile) -> Optional[str]:
         """Return email only if show_email is True."""
         if obj.show_email:
             return obj.get_display_email()
         return None
-    
-    def get_phone_display(self, obj):
+
+    def get_phone_display(self, obj: Profile) -> Optional[str]:
         """Return phone only if show_phone is True."""
         if obj.show_phone:
             return obj.phone
         return None
     
-    def get_location_display(self, obj):
+    def get_location_display(self, obj: Profile) -> Optional[str]:
         """Return location only if show_location is True."""
         if obj.show_location:
             return obj.location

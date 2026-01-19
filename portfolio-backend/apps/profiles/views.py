@@ -1,12 +1,13 @@
 """
 Views for Profile management
 """
-from rest_framework import generics, status
+from rest_framework import generics, status, serializers as s
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 from .models import Profile
 from .serializers import (
@@ -63,6 +64,31 @@ class PublicProfileView(generics.RetrieveAPIView):
         return Response(serializer.data)
 
 
+# ========== UPLOAD PROFILE PHOTO - AVEC SCHEMA ==========
+class PhotoUploadResponseSerializer(s.Serializer):
+    """Response for photo upload"""
+    message = s.CharField()
+    photo_url = s.URLField(allow_null=True)
+
+@extend_schema(
+    request={
+        'multipart/form-data': {
+            'type': 'object',
+            'properties': {
+                'photo': {
+                    'type': 'string',
+                    'format': 'binary',
+                    'description': 'Image de profil (JPG, PNG, WEBP, max 5MB)'
+                }
+            }
+        }
+    },
+    responses={
+        200: PhotoUploadResponseSerializer,
+        400: OpenApiResponse(description="Aucune photo fournie ou format invalide")
+    },
+    description="Upload d'une photo de profil"
+)
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def upload_profile_photo(request):
@@ -93,6 +119,19 @@ def upload_profile_photo(request):
     }, status=status.HTTP_200_OK)
 
 
+# ========== DELETE PROFILE PHOTO - AVEC SCHEMA ==========
+class PhotoDeleteResponseSerializer(s.Serializer):
+    """Response for photo deletion"""
+    message = s.CharField()
+
+@extend_schema(
+    request=None,
+    responses={
+        200: PhotoDeleteResponseSerializer,
+        400: OpenApiResponse(description="Aucune photo à supprimer")
+    },
+    description="Suppression de la photo de profil"
+)
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_profile_photo(request):
@@ -116,6 +155,17 @@ def delete_profile_photo(request):
     }, status=status.HTTP_200_OK)
 
 
+# ========== CHECK PROFILE COMPLETENESS - AVEC SCHEMA ==========
+class ProfileCompletenessResponseSerializer(s.Serializer):
+    """Response for profile completeness check"""
+    is_complete = s.BooleanField()
+    profile_views = s.IntegerField()
+
+@extend_schema(
+    request=None,
+    responses={200: ProfileCompletenessResponseSerializer},
+    description="Vérifier si le profil est complet"
+)
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def check_profile_completeness(request):

@@ -5,6 +5,8 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from drf_spectacular.utils import extend_schema
+from drf_spectacular.openapi import OpenApiParameter, OpenApiTypes
 
 from apps.core.permissions import IsOwner, VisibilityPermission
 from apps.core.enums import Visibility
@@ -17,6 +19,8 @@ from .serializers import (
     CertificationCreateUpdateSerializer,
     CertificationPublicSerializer,
 )
+
+
 
 
 class DiplomaViewSet(viewsets.ModelViewSet):
@@ -32,6 +36,58 @@ class DiplomaViewSet(viewsets.ModelViewSet):
     - GET /api/education/diplomas/public/ - List public diplomas
     """
     permission_classes = [IsAuthenticated, IsOwner]
+    
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                'id',
+                OpenApiTypes.UUID,
+                OpenApiParameter.PATH,
+                description='Diploma ID'
+            )
+        ]
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+    
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                'id',
+                OpenApiTypes.UUID,
+                OpenApiParameter.PATH,
+                description='Diploma ID'
+            )
+        ]
+    )
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+    
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                'id',
+                OpenApiTypes.UUID,
+                OpenApiParameter.PATH,
+                description='Diploma ID'
+            )
+        ]
+    )
+    def partial_update(self, request, *args, **kwargs):
+        return super().partial_update(request, *args, **kwargs)
+    
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                'id',
+                OpenApiTypes.UUID,
+                OpenApiParameter.PATH,
+                description='Diploma ID'
+            )
+        ]
+    )
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)
     
     def get_queryset(self):
         """Return diplomas for the authenticated user."""
@@ -50,7 +106,59 @@ class DiplomaViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'], permission_classes=[AllowAny])
     def public(self, request):
         """
-        Get all public diplomas for a specific user.
+        Get all public diplomas for a specific use
+    
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                'id',
+                OpenApiTypes.UUID,
+                OpenApiParameter.PATH,
+                description='Certification ID'
+            )
+        ]
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+    
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                'id',
+                OpenApiTypes.UUID,
+                OpenApiParameter.PATH,
+                description='Certification ID'
+            )
+        ]
+    )
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+    
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                'id',
+                OpenApiTypes.UUID,
+                OpenApiParameter.PATH,
+                description='Certification ID'
+            )
+        ]
+    )
+    def partial_update(self, request, *args, **kwargs):
+        return super().partial_update(request, *args, **kwargs)
+    
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                'id',
+                OpenApiTypes.UUID,
+                OpenApiParameter.PATH,
+                description='Certification ID'
+            )
+        ]
+    )
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)r.
         
         Query params:
         - user_id: UUID of the user

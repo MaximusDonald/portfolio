@@ -5,9 +5,11 @@ from rest_framework import status, generics
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework import serializers as s
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
+from drf_spectacular.utils import extend_schema, OpenApiResponse
 
 from .serializers import (
     CustomTokenObtainPairSerializer,
@@ -55,6 +57,23 @@ class RegisterView(generics.CreateAPIView):
         }, status=status.HTTP_201_CREATED)
 
 
+
+class LogoutRequestSerializer(s.Serializer):
+    """Serializer for logout request"""
+    refresh = s.CharField(help_text="Refresh token à blacklister")
+
+class LogoutResponseSerializer(s.Serializer):
+    """Serializer for logout response"""
+    message = s.CharField()
+
+@extend_schema(
+    request=LogoutRequestSerializer,
+    responses={
+        200: LogoutResponseSerializer,
+        400: OpenApiResponse(description="Token invalide ou manquant")
+    },
+    description="Déconnexion de l'utilisateur et blacklist du refresh token"
+)
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def logout_view(request):
@@ -127,6 +146,17 @@ class ChangePasswordView(generics.UpdateAPIView):
         )
 
 
+# ========== VERIFY TOKEN VIEW - AVEC SCHEMA ==========
+class VerifyTokenResponseSerializer(s.Serializer):
+    """Serializer for token verification response"""
+    valid = s.BooleanField()
+    user = UserSerializer()
+
+@extend_schema(
+    request=None,
+    responses={200: VerifyTokenResponseSerializer},
+    description="Vérifier la validité du token JWT"
+)
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def verify_token_view(request):

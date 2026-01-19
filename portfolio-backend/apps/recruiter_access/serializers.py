@@ -49,7 +49,7 @@ class RecruiterLinkSerializer(BaseSerializer):
             'updated_at',
         ]
     
-    def get_full_url(self, obj):
+    def get_full_url(self, obj: RecruiterLink) -> str:
         """Return the full URL with token."""
         request = self.context.get('request')
         if request:

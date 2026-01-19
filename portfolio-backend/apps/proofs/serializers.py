@@ -3,6 +3,7 @@ Serializers for proofs
 """
 from rest_framework import serializers
 from django.contrib.contenttypes.models import ContentType
+from typing import Optional
 
 from apps.core.serializers import BaseSerializer
 from .models import Proof
@@ -58,7 +59,7 @@ class ProofSerializer(BaseSerializer):
             'updated_at',
         ]
     
-    def get_file_url(self, obj):
+    def get_file_url(self, obj: Proof) -> Optional[str]:
         """Return the file URL."""
         request = self.context.get('request')
         if obj.file and request:

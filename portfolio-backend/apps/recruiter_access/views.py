@@ -5,6 +5,8 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from drf_spectacular.utils import extend_schema
+from drf_spectacular.openapi import OpenApiParameter, OpenApiTypes
 
 from .models import RecruiterLink
 from .serializers import (
@@ -28,6 +30,58 @@ class RecruiterLinkViewSet(viewsets.ModelViewSet):
     - POST /api/recruiter-access/validate/ - Validate a token
     """
     permission_classes = [IsAuthenticated]
+    
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                'id',
+                OpenApiTypes.UUID,
+                OpenApiParameter.PATH,
+                description='RecruiterLink ID'
+            )
+        ]
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+    
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                'id',
+                OpenApiTypes.UUID,
+                OpenApiParameter.PATH,
+                description='RecruiterLink ID'
+            )
+        ]
+    )
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+    
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                'id',
+                OpenApiTypes.UUID,
+                OpenApiParameter.PATH,
+                description='RecruiterLink ID'
+            )
+        ]
+    )
+    def partial_update(self, request, *args, **kwargs):
+        return super().partial_update(request, *args, **kwargs)
+    
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                'id',
+                OpenApiTypes.UUID,
+                OpenApiParameter.PATH,
+                description='RecruiterLink ID'
+            )
+        ]
+    )
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)
     
     def get_queryset(self):
         """Return links for the authenticated user."""

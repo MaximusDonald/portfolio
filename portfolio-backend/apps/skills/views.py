@@ -6,6 +6,8 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.db.models import Count, Q
+from drf_spectacular.utils import extend_schema
+from drf_spectacular.openapi import OpenApiParameter, OpenApiTypes
 
 from apps.core.permissions import IsOwner
 from apps.core.enums import SkillCategory, SkillLevel
@@ -34,6 +36,58 @@ class SkillViewSet(viewsets.ModelViewSet):
     - GET /api/skills/primary/ - Get primary skills only
     """
     permission_classes = [IsAuthenticated, IsOwner]
+    
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                'id',
+                OpenApiTypes.UUID,
+                OpenApiParameter.PATH,
+                description='Skill ID'
+            )
+        ]
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+    
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                'id',
+                OpenApiTypes.UUID,
+                OpenApiParameter.PATH,
+                description='Skill ID'
+            )
+        ]
+    )
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+    
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                'id',
+                OpenApiTypes.UUID,
+                OpenApiParameter.PATH,
+                description='Skill ID'
+            )
+        ]
+    )
+    def partial_update(self, request, *args, **kwargs):
+        return super().partial_update(request, *args, **kwargs)
+    
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                'id',
+                OpenApiTypes.UUID,
+                OpenApiParameter.PATH,
+                description='Skill ID'
+            )
+        ]
+    )
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)
     
     def get_queryset(self):
         """Return skills for the authenticated user."""

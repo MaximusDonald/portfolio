@@ -178,7 +178,40 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'API REST pour portfolio professionnel dynamique et sécurisé',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
+    
+    # ✅ Organisation des composants
     'COMPONENT_SPLIT_REQUEST': True,
+    
+    # ✅ Résolution des collisions d'enums
+    # Format: 'NomAutomatiqueGénéré': 'apps.mon_app.enums.MonEnum'
+    'ENUM_NAME_OVERRIDES': {
+        # Collision sur "level" → On spécifie le chemin complet de l'enum
+        'Level1eaEnum': 'apps.core.enums.SkillLevel',
+        'LevelB5cEnum': 'apps.core.enums.DiplomaLevel',
+    },
+    
+    # ✅ Meilleure organisation des noms de méthodes
+    'SCHEMA_COERCE_METHOD_NAMES': {
+        'list': 'list',
+        'retrieve': 'retrieve',
+        'create': 'create',
+        'update': 'update',
+        'partial_update': 'partialUpdate',
+        'destroy': 'destroy',
+    },
+    
+    # ✅ Préfixe des chemins
+    'SCHEMA_PATH_PREFIX': r'/api/',
+    
+    # ✅ Configuration des paramètres de chemin (path parameters)
+    # Indique que tous les "id" sont des UUID par défaut
+    'SCHEMA_COERCE_PATH_PK': True,
+    'SCHEMA_COERCE_PATH_PK_SUFFIX': True,
+    
+    # ✅ Hook de préprocessing pour forcer les UUID
+    'PREPROCESSING_HOOKS': [
+        'apps.core.schema_hooks.preprocess_uuid_parameters',
+    ],
 }
 
 # ==============================================================================
