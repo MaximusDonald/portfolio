@@ -1,0 +1,198 @@
+/* ============================================
+   TAILWIND IMPORTS
+   ============================================ */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ============================================
+   CUSTOM CSS VARIABLES - LIGHT MODE (défaut)
+   ============================================ */
+:root {
+  /* Couleurs principales - Palette Bleu/Violet (moderne) */
+  --color-primary-50: #f0f4ff;
+  --color-primary-100: #e0e8ff;
+  --color-primary-200: #c7d7fe;
+  --color-primary-300: #a5b9fc;
+  --color-primary-400: #8191f8;
+  --color-primary-500: #6366f1; /* Couleur principale */
+  --color-primary-600: #4f46e5;
+  --color-primary-700: #4338ca;
+  --color-primary-800: #3730a3;
+  --color-primary-900: #312e81;
+
+  /* Couleurs sémantiques */
+  --color-success: #10b981;
+  --color-warning: #f59e0b;
+  --color-error: #ef4444;
+  --color-info: #3b82f6;
+
+  /* Couleurs de texte */
+  --text-primary: #1f2937;
+  --text-secondary: #6b7280;
+  --text-tertiary: #9ca3af;
+
+  /* Couleurs de fond */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f9fafb;
+  --bg-tertiary: #f3f4f6;
+
+  /* Bordures */
+  --border-color: #e5e7eb;
+  --border-radius: 0.5rem;
+
+  /* Ombres */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+}
+
+/* ============================================
+   DARK MODE
+   ============================================ */
+.dark {
+  /* Couleurs principales - Ajustées pour le dark mode */
+  --color-primary-50: #312e81;
+  --color-primary-100: #3730a3;
+  --color-primary-200: #4338ca;
+  --color-primary-300: #4f46e5;
+  --color-primary-400: #6366f1;
+  --color-primary-500: #8191f8; /* Couleur principale en dark */
+  --color-primary-600: #a5b9fc;
+  --color-primary-700: #c7d7fe;
+  --color-primary-800: #e0e8ff;
+  --color-primary-900: #f0f4ff;
+
+  /* Couleurs sémantiques (légèrement plus vives) */
+  --color-success: #34d399;
+  --color-warning: #f59e0b;
+  --color-error: #f87171;
+  --color-info: #60a5fa;
+
+  /* Couleurs de texte */
+  --text-primary: #f9fafb;
+  --text-secondary: #d1d5db;
+  --text-tertiary: #9ca3af;
+
+  /* Couleurs de fond */
+  --bg-primary: #111827;
+  --bg-secondary: #1f2937;
+  --bg-tertiary: #374151;
+
+  /* Bordures */
+  --border-color: #374151;
+
+  /* Ombres */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5);
+}
+
+/* ============================================
+   BASE STYLES
+   ============================================ */
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+
+  body {
+    @apply bg-[var(--bg-primary)] text-[var(--text-primary)] antialiased;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+
+  h1 {
+    @apply text-4xl;
+  }
+
+  h2 {
+    @apply text-3xl;
+  }
+
+  h3 {
+    @apply text-2xl;
+  }
+
+  a {
+    @apply transition-colors duration-200;
+  }
+}
+
+/* ============================================
+   CUSTOM UTILITIES
+   ============================================ */
+@layer utilities {
+  /* Conteneur principal */
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Card standard */
+  .card {
+    @apply bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--border-radius)] shadow-[var(--shadow-sm)];
+  }
+
+  /* Texte avec couleur secondaire */
+  .text-secondary {
+    @apply text-[var(--text-secondary)];
+  }
+
+  /* Texte avec couleur tertiaire */
+  .text-tertiary {
+    @apply text-[var(--text-tertiary)];
+  }
+
+  /* Animation de chargement */
+  .loading-skeleton {
+    @apply animate-pulse bg-[var(--bg-tertiary)] rounded;
+  }
+}
+
+/* ============================================
+   ANIMATIONS CUSTOM
+   ============================================ */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.shimmer {
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(
+    to right,
+    var(--bg-secondary) 0%,
+    var(--bg-tertiary) 20%,
+    var(--bg-secondary) 40%,
+    var(--bg-secondary) 100%
+  );
+  background-size: 1000px 100%;
+}
+
+/* ============================================
+   SCROLLBAR CUSTOM
+   ============================================ */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-[var(--bg-secondary)];
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-[var(--text-tertiary)] rounded-full;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-[var(--text-secondary)];
+}

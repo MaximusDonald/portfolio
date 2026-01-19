@@ -334,3 +334,137 @@ Tracking des accès (optionnel)
 ├── utils.py               # Token validation
 └── migrations/
     └── __init__.py
+
+
+
+
+
+
+# Frontend-React
+
+portfolio-frontend/
+├── public/
+│   └── vite.svg
+│
+├── src/
+│   ├── api/                      # 🔌 API Client & Endpoints
+│   │   ├── client.js            # Configuration Axios
+│   │   ├── endpoints/           # Endpoints organisés par domaine
+│   │   │   ├── auth.js          # Login, Register, Logout
+│   │   │   ├── profile.js       # Profil utilisateur
+│   │   │   ├── projects.js      # CRUD Projets
+│   │   │   ├── skills.js        # CRUD Compétences
+│   │   │   ├── education.js     # Diplômes + Certifications
+│   │   │   ├── professional.js  # Expériences + Formations
+│   │   │   ├── proofs.js        # Preuves & fichiers
+│   │   │   └── recruiter.js     # Liens recruteur
+│   │   └── index.js             # Export centralisé
+│   │
+│   ├── auth/                     # 🔐 Authentification
+│   │   ├── AuthContext.jsx      # Context Provider
+│   │   ├── AuthProvider.jsx     # Provider avec logique
+│   │   ├── ProtectedRoute.jsx   # Route protégée
+│   │   └── hooks/
+│   │       ├── useAuth.js       # Hook d'auth
+│   │       └── useUser.js       # Hook utilisateur
+│   │
+│   ├── components/               # 🧩 Composants réutilisables
+│   │   ├── ui/                  # Composants UI de base
+│   │   │   ├── Button.jsx
+│   │   │   ├── Card.jsx
+│   │   │   ├── Input.jsx
+│   │   │   ├── Select.jsx
+│   │   │   ├── Badge.jsx
+│   │   │   ├── Modal.jsx
+│   │   │   ├── Spinner.jsx
+│   │   │   └── Alert.jsx
+│   │   │
+│   │   ├── layout/              # Layouts & Navigation
+│   │   │   ├── Header.jsx
+│   │   │   ├── Footer.jsx
+│   │   │   ├── Sidebar.jsx
+│   │   │   └── Container.jsx
+│   │   │
+│   │   └── shared/              # Composants partagés métier
+│   │       ├── SkillCard.jsx
+│   │       ├── ProjectCard.jsx
+│   │       ├── ProfileHeader.jsx
+│   │       └── FileUpload.jsx
+│   │
+│   ├── features/                 # 📦 Features par domaine métier
+│   │   ├── projects/
+│   │   │   ├── components/
+│   │   │   │   ├── ProjectList.jsx
+│   │   │   │   ├── ProjectForm.jsx
+│   │   │   │   └── ProjectDetail.jsx
+│   │   │   ├── hooks/
+│   │   │   │   └── useProjects.js
+│   │   │   └── index.js
+│   │   │
+│   │   ├── skills/
+│   │   │   ├── components/
+│   │   │   ├── hooks/
+│   │   │   └── index.js
+│   │   │
+│   │   ├── education/
+│   │   ├── professional/
+│   │   └── profile/
+│   │
+│   ├── layouts/                  # 🎨 Layouts globaux
+│   │   ├── PublicLayout.jsx     # Layout public (visiteur)
+│   │   ├── AdminLayout.jsx      # Layout admin (dashboard)
+│   │   └── AuthLayout.jsx       # Layout auth (login/register)
+│   │
+│   ├── pages/                    # 📄 Pages principales
+│   │   ├── public/
+│   │   │   ├── Home.jsx
+│   │   │   ├── Portfolio.jsx
+│   │   │   └── NotFound.jsx
+│   │   │
+│   │   ├── auth/
+│   │   │   ├── Login.jsx
+│   │   │   └── Register.jsx
+│   │   │
+│   │   └── admin/
+│   │       ├── Dashboard.jsx
+│   │       ├── Projects.jsx
+│   │       ├── Skills.jsx
+│   │       ├── Education.jsx
+│   │       ├── Professional.jsx
+│   │       └── Settings.jsx
+│   │
+│   ├── hooks/                    # 🎣 Hooks personnalisés
+│   │   ├── useTheme.js          # Gestion du thème
+│   │   ├── useApi.js            # Hook API générique
+│   │   ├── useDebounce.js
+│   │   └── useLocalStorage.js
+│   │
+│   ├── theme/                    # 🎨 Thème & Design System
+│   │   ├── colors.js            # Palette de couleurs
+│   │   ├── theme.css            # Variables CSS
+│   │   └── ThemeProvider.jsx    # Provider de thème
+│   │
+│   ├── utils/                    # 🛠️ Utilitaires
+│   │   ├── cn.js                # Utility pour classes CSS
+│   │   ├── formatters.js        # Formatage dates, nombres
+│   │   ├── validators.js        # Validations
+│   │   └── constants.js         # Constantes globales
+│   │
+│   ├── styles/                   # 💅 Styles globaux
+│   │   ├── index.css            # Import Tailwind + custom
+│   │   └── animations.css       # Animations custom
+│   │
+│   ├── App.jsx                   # App principale
+│   ├── main.jsx                  # Point d'entrée
+│   └── router.jsx                # Configuration des routes
+│
+├── .env.example                  # Variables d'env exemple
+├── .env.local                    # Variables d'env locales
+├── .gitignore
+├── index.html
+├── package.json
+├── postcss.config.js
+├── tailwind.config.js
+├── vite.config.js
+└── README.md
+
