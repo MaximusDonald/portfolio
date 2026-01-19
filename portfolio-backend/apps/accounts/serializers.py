@@ -25,6 +25,10 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             'last_name': self.user.last_name,
             'full_name': self.user.get_full_name(),
         }
+        data['tokens'] = {
+            'access': data.pop('access'),
+            'refresh': data.pop('refresh'),
+        }
         
         return data
 
