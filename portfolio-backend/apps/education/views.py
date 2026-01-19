@@ -5,7 +5,7 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from drf_spectacular.openapi import OpenApiParameter, OpenApiTypes
 
 from apps.core.permissions import IsOwner, VisibilityPermission
@@ -21,8 +21,35 @@ from .serializers import (
 )
 
 
-
-
+# ========== DIPLOMA VIEWSET ==========
+@extend_schema_view(
+    list=extend_schema(description="Liste de tous mes diplômes"),
+    retrieve=extend_schema(
+        description="Récupérer un diplôme par son ID",
+        parameters=[
+            OpenApiParameter('id', OpenApiTypes.UUID, OpenApiParameter.PATH, description='Diploma ID')
+        ]
+    ),
+    create=extend_schema(description="Créer un nouveau diplôme"),
+    update=extend_schema(
+        description="Mettre à jour un diplôme",
+        parameters=[
+            OpenApiParameter('id', OpenApiTypes.UUID, OpenApiParameter.PATH, description='Diploma ID')
+        ]
+    ),
+    partial_update=extend_schema(
+        description="Mise à jour partielle d'un diplôme",
+        parameters=[
+            OpenApiParameter('id', OpenApiTypes.UUID, OpenApiParameter.PATH, description='Diploma ID')
+        ]
+    ),
+    destroy=extend_schema(
+        description="Supprimer un diplôme",
+        parameters=[
+            OpenApiParameter('id', OpenApiTypes.UUID, OpenApiParameter.PATH, description='Diploma ID')
+        ]
+    )
+)
 class DiplomaViewSet(viewsets.ModelViewSet):
     """
     ViewSet for managing diplomas.
@@ -36,58 +63,6 @@ class DiplomaViewSet(viewsets.ModelViewSet):
     - GET /api/education/diplomas/public/ - List public diplomas
     """
     permission_classes = [IsAuthenticated, IsOwner]
-    
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                'id',
-                OpenApiTypes.UUID,
-                OpenApiParameter.PATH,
-                description='Diploma ID'
-            )
-        ]
-    )
-    def retrieve(self, request, *args, **kwargs):
-        return super().retrieve(request, *args, **kwargs)
-    
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                'id',
-                OpenApiTypes.UUID,
-                OpenApiParameter.PATH,
-                description='Diploma ID'
-            )
-        ]
-    )
-    def update(self, request, *args, **kwargs):
-        return super().update(request, *args, **kwargs)
-    
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                'id',
-                OpenApiTypes.UUID,
-                OpenApiParameter.PATH,
-                description='Diploma ID'
-            )
-        ]
-    )
-    def partial_update(self, request, *args, **kwargs):
-        return super().partial_update(request, *args, **kwargs)
-    
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                'id',
-                OpenApiTypes.UUID,
-                OpenApiParameter.PATH,
-                description='Diploma ID'
-            )
-        ]
-    )
-    def destroy(self, request, *args, **kwargs):
-        return super().destroy(request, *args, **kwargs)
     
     def get_queryset(self):
         """Return diplomas for the authenticated user."""
@@ -106,59 +81,7 @@ class DiplomaViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'], permission_classes=[AllowAny])
     def public(self, request):
         """
-        Get all public diplomas for a specific use
-    
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                'id',
-                OpenApiTypes.UUID,
-                OpenApiParameter.PATH,
-                description='Certification ID'
-            )
-        ]
-    )
-    def retrieve(self, request, *args, **kwargs):
-        return super().retrieve(request, *args, **kwargs)
-    
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                'id',
-                OpenApiTypes.UUID,
-                OpenApiParameter.PATH,
-                description='Certification ID'
-            )
-        ]
-    )
-    def update(self, request, *args, **kwargs):
-        return super().update(request, *args, **kwargs)
-    
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                'id',
-                OpenApiTypes.UUID,
-                OpenApiParameter.PATH,
-                description='Certification ID'
-            )
-        ]
-    )
-    def partial_update(self, request, *args, **kwargs):
-        return super().partial_update(request, *args, **kwargs)
-    
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                'id',
-                OpenApiTypes.UUID,
-                OpenApiParameter.PATH,
-                description='Certification ID'
-            )
-        ]
-    )
-    def destroy(self, request, *args, **kwargs):
-        return super().destroy(request, *args, **kwargs)r.
+        Get all public diplomas for a specific user.
         
         Query params:
         - user_id: UUID of the user
@@ -194,7 +117,6 @@ class DiplomaViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Update display_order for each diploma
         for item in diplomas_data:
             diploma_id = item.get('id')
             display_order = item.get('display_order')
@@ -209,6 +131,35 @@ class DiplomaViewSet(viewsets.ModelViewSet):
         return Response({'message': 'Ordre mis à jour'}, status=status.HTTP_200_OK)
 
 
+# ========== CERTIFICATION VIEWSET ==========
+@extend_schema_view(
+    list=extend_schema(description="Liste de toutes mes certifications"),
+    retrieve=extend_schema(
+        description="Récupérer une certification par son ID",
+        parameters=[
+            OpenApiParameter('id', OpenApiTypes.UUID, OpenApiParameter.PATH, description='Certification ID')
+        ]
+    ),
+    create=extend_schema(description="Créer une nouvelle certification"),
+    update=extend_schema(
+        description="Mettre à jour une certification",
+        parameters=[
+            OpenApiParameter('id', OpenApiTypes.UUID, OpenApiParameter.PATH, description='Certification ID')
+        ]
+    ),
+    partial_update=extend_schema(
+        description="Mise à jour partielle d'une certification",
+        parameters=[
+            OpenApiParameter('id', OpenApiTypes.UUID, OpenApiParameter.PATH, description='Certification ID')
+        ]
+    ),
+    destroy=extend_schema(
+        description="Supprimer une certification",
+        parameters=[
+            OpenApiParameter('id', OpenApiTypes.UUID, OpenApiParameter.PATH, description='Certification ID')
+        ]
+    )
+)
 class CertificationViewSet(viewsets.ModelViewSet):
     """
     ViewSet for managing certifications.
@@ -276,7 +227,6 @@ class CertificationViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Update display_order for each certification
         for item in certifications_data:
             cert_id = item.get('id')
             display_order = item.get('display_order')

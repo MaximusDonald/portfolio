@@ -6,7 +6,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.db.models import Count, Q
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from drf_spectacular.openapi import OpenApiParameter, OpenApiTypes
 
 from apps.core.permissions import IsOwner
@@ -21,73 +21,37 @@ from .serializers import (
 )
 
 
+@extend_schema_view(
+    list=extend_schema(description="Liste de toutes mes compétences"),
+    retrieve=extend_schema(
+        description="Récupérer une compétence par son ID",
+        parameters=[
+            OpenApiParameter('id', OpenApiTypes.UUID, OpenApiParameter.PATH, description='Skill ID')
+        ]
+    ),
+    create=extend_schema(description="Créer une nouvelle compétence"),
+    update=extend_schema(
+        description="Mettre à jour une compétence",
+        parameters=[
+            OpenApiParameter('id', OpenApiTypes.UUID, OpenApiParameter.PATH, description='Skill ID')
+        ]
+    ),
+    partial_update=extend_schema(
+        description="Mise à jour partielle d'une compétence",
+        parameters=[
+            OpenApiParameter('id', OpenApiTypes.UUID, OpenApiParameter.PATH, description='Skill ID')
+        ]
+    ),
+    destroy=extend_schema(
+        description="Supprimer une compétence",
+        parameters=[
+            OpenApiParameter('id', OpenApiTypes.UUID, OpenApiParameter.PATH, description='Skill ID')
+        ]
+    )
+)
 class SkillViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet for managing skills.
-    
-    Endpoints:
-    - GET /api/skills/ - List all my skills
-    - POST /api/skills/ - Create a new skill
-    - GET /api/skills/{id}/ - Get skill details
-    - PATCH/PUT /api/skills/{id}/ - Update skill
-    - DELETE /api/skills/{id}/ - Delete skill
-    - GET /api/skills/public/ - List public skills
-    - GET /api/skills/grouped/ - Get skills grouped by category
-    - GET /api/skills/primary/ - Get primary skills only
-    """
+    """ViewSet for managing skills."""
     permission_classes = [IsAuthenticated, IsOwner]
-    
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                'id',
-                OpenApiTypes.UUID,
-                OpenApiParameter.PATH,
-                description='Skill ID'
-            )
-        ]
-    )
-    def retrieve(self, request, *args, **kwargs):
-        return super().retrieve(request, *args, **kwargs)
-    
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                'id',
-                OpenApiTypes.UUID,
-                OpenApiParameter.PATH,
-                description='Skill ID'
-            )
-        ]
-    )
-    def update(self, request, *args, **kwargs):
-        return super().update(request, *args, **kwargs)
-    
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                'id',
-                OpenApiTypes.UUID,
-                OpenApiParameter.PATH,
-                description='Skill ID'
-            )
-        ]
-    )
-    def partial_update(self, request, *args, **kwargs):
-        return super().partial_update(request, *args, **kwargs)
-    
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                'id',
-                OpenApiTypes.UUID,
-                OpenApiParameter.PATH,
-                description='Skill ID'
-            )
-        ]
-    )
-    def destroy(self, request, *args, **kwargs):
-        return super().destroy(request, *args, **kwargs)
     
     def get_queryset(self):
         """Return skills for the authenticated user."""
@@ -107,12 +71,7 @@ class SkillViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['get'], permission_classes=[AllowAny])
     def public(self, request):
-        """
-        Get all public skills for a specific user.
-        
-        Query params:
-        - user_id: UUID of the user
-        """
+        """Get all public skills for a specific user."""
         user_id = request.query_params.get('user_id')
         
         if not user_id:
@@ -128,12 +87,7 @@ class SkillViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['get'], permission_classes=[AllowAny])
     def grouped(self, request):
-        """
-        Get skills grouped by category for a specific user.
-        
-        Query params:
-        - user_id: UUID of the user
-        """
+        """Get skills grouped by category for a specific user."""
         user_id = request.query_params.get('user_id')
         
         if not user_id:
@@ -142,7 +96,6 @@ class SkillViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Get all skills grouped by category
         grouped_skills = []
         
         for category_code, category_name in SkillCategory.choices:
@@ -164,12 +117,7 @@ class SkillViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['get'], permission_classes=[AllowAny])
     def primary(self, request):
-        """
-        Get primary skills only for a specific user.
-        
-        Query params:
-        - user_id: UUID of the user
-        """
+        """Get primary skills only for a specific user."""
         user_id = request.query_params.get('user_id')
         
         if not user_id:
@@ -188,11 +136,7 @@ class SkillViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['post'])
     def reorder(self, request):
-        """
-        Reorder skills.
-        
-        Body: { "skills": [{"id": "uuid", "display_order": 0}, ...] }
-        """
+        """Reorder skills."""
         skills_data = request.data.get('skills', [])
         
         if not skills_data:
@@ -214,13 +158,14 @@ class SkillViewSet(viewsets.ModelViewSet):
         
         return Response({'message': 'Ordre mis à jour'}, status=status.HTTP_200_OK)
     
+    @extend_schema(
+        parameters=[
+            OpenApiParameter('id', OpenApiTypes.UUID, OpenApiParameter.PATH, description='Skill ID')
+        ]
+    )
     @action(detail=True, methods=['post'])
     def toggle_primary(self, request, pk=None):
-        """
-        Toggle primary status of a skill.
-        
-        POST /api/skills/{id}/toggle_primary/
-        """
+        """Toggle primary status of a skill."""
         skill = self.get_object()
         skill.is_primary = not skill.is_primary
         skill.save(update_fields=['is_primary'])
@@ -232,21 +177,15 @@ class SkillViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['get'])
     def statistics(self, request):
-        """
-        Get statistics about user's skills.
-        
-        GET /api/skills/statistics/
-        """
+        """Get statistics about user's skills."""
         skills = self.get_queryset()
         
-        # Count by category
         by_category = {}
         for category_code, category_name in SkillCategory.choices:
             count = skills.filter(category=category_code).count()
             if count > 0:
                 by_category[category_name] = count
         
-        # Count by level
         by_level = {}
         for level_code, level_name in SkillLevel.choices:
             count = skills.filter(level=level_code).count()

@@ -1,3 +1,6 @@
+# ==========================================
+# apps/proofs/views.py
+# ==========================================
 """
 Views for proofs
 """
@@ -7,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.parsers import MultiPartParser, FormParser
 from django.contrib.contenttypes.models import ContentType
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from drf_spectacular.openapi import OpenApiParameter, OpenApiTypes
 
 from apps.core.permissions import IsOwner
@@ -20,72 +23,38 @@ from .serializers import (
 )
 
 
+@extend_schema_view(
+    list=extend_schema(description="Liste de toutes mes preuves"),
+    retrieve=extend_schema(
+        description="Récupérer une preuve par son ID",
+        parameters=[
+            OpenApiParameter('id', OpenApiTypes.UUID, OpenApiParameter.PATH, description='Proof ID')
+        ]
+    ),
+    create=extend_schema(description="Upload une nouvelle preuve"),
+    update=extend_schema(
+        description="Mettre à jour une preuve",
+        parameters=[
+            OpenApiParameter('id', OpenApiTypes.UUID, OpenApiParameter.PATH, description='Proof ID')
+        ]
+    ),
+    partial_update=extend_schema(
+        description="Mise à jour partielle d'une preuve",
+        parameters=[
+            OpenApiParameter('id', OpenApiTypes.UUID, OpenApiParameter.PATH, description='Proof ID')
+        ]
+    ),
+    destroy=extend_schema(
+        description="Supprimer une preuve",
+        parameters=[
+            OpenApiParameter('id', OpenApiTypes.UUID, OpenApiParameter.PATH, description='Proof ID')
+        ]
+    )
+)
 class ProofViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet for managing proofs.
-    
-    Endpoints:
-    - GET /api/proofs/ - List all my proofs
-    - POST /api/proofs/ - Upload a new proof
-    - GET /api/proofs/{id}/ - Get proof details
-    - PATCH/PUT /api/proofs/{id}/ - Update proof metadata
-    - DELETE /api/proofs/{id}/ - Delete proof
-    - GET /api/proofs/for-object/ - Get proofs for a specific object
-    """
+    """ViewSet for managing proofs."""
     permission_classes = [IsAuthenticated, IsOwner]
     parser_classes = [MultiPartParser, FormParser]
-    
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                'id',
-                OpenApiTypes.UUID,
-                OpenApiParameter.PATH,
-                description='Proof ID'
-            )
-        ]
-    )
-    def retrieve(self, request, *args, **kwargs):
-        return super().retrieve(request, *args, **kwargs)
-    
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                'id',
-                OpenApiTypes.UUID,
-                OpenApiParameter.PATH,
-                description='Proof ID'
-            )
-        ]
-    )
-    def update(self, request, *args, **kwargs):
-        return super().update(request, *args, **kwargs)
-    
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                'id',
-                OpenApiTypes.UUID,
-                OpenApiParameter.PATH,
-                description='Proof ID'
-            )
-        ]
-    )
-    def partial_update(self, request, *args, **kwargs):
-        return super().partial_update(request, *args, **kwargs)
-    
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                'id',
-                OpenApiTypes.UUID,
-                OpenApiParameter.PATH,
-                description='Proof ID'
-            )
-        ]
-    )
-    def destroy(self, request, *args, **kwargs):
-        return super().destroy(request, *args, **kwargs)
     
     def get_queryset(self):
         """Return proofs for the authenticated user."""
@@ -103,13 +72,7 @@ class ProofViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['get'])
     def for_object(self, request):
-        """
-        Get all proofs for a specific object.
-        
-        Query params:
-        - content_type: Model name (diploma, certification, project, etc.)
-        - object_id: UUID of the object
-        """
+        """Get all proofs for a specific object."""
         content_type_name = request.query_params.get('content_type')
         object_id = request.query_params.get('object_id')
         
@@ -119,7 +82,6 @@ class ProofViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Map model names
         model_mapping = {
             'diploma': ('education', 'diploma'),
             'certification': ('education', 'certification'),
@@ -147,11 +109,7 @@ class ProofViewSet(viewsets.ModelViewSet):
     
     @action(detail=False, methods=['post'])
     def reorder(self, request):
-        """
-        Reorder proofs.
-        
-        Body: { "proofs": [{"id": "uuid", "display_order": 0}, ...] }
-        """
+        """Reorder proofs."""
         proofs_data = request.data.get('proofs', [])
         
         if not proofs_data:

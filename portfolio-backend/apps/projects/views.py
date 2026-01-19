@@ -6,7 +6,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.parsers import MultiPartParser, FormParser
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from drf_spectacular.openapi import OpenApiParameter, OpenApiTypes
 
 from apps.core.permissions import IsOwner
@@ -20,7 +20,34 @@ from .serializers import (
 )
 
 
-
+@extend_schema_view(
+    list=extend_schema(description="Liste de tous mes projets"),
+    retrieve=extend_schema(
+        description="Récupérer un projet par son ID",
+        parameters=[
+            OpenApiParameter('id', OpenApiTypes.UUID, OpenApiParameter.PATH, description='Project ID')
+        ]
+    ),
+    create=extend_schema(description="Créer un nouveau projet"),
+    update=extend_schema(
+        description="Mettre à jour un projet",
+        parameters=[
+            OpenApiParameter('id', OpenApiTypes.UUID, OpenApiParameter.PATH, description='Project ID')
+        ]
+    ),
+    partial_update=extend_schema(
+        description="Mise à jour partielle d'un projet",
+        parameters=[
+            OpenApiParameter('id', OpenApiTypes.UUID, OpenApiParameter.PATH, description='Project ID')
+        ]
+    ),
+    destroy=extend_schema(
+        description="Supprimer un projet",
+        parameters=[
+            OpenApiParameter('id', OpenApiTypes.UUID, OpenApiParameter.PATH, description='Project ID')
+        ]
+    )
+)
 class ProjectViewSet(viewsets.ModelViewSet):
     """
     ViewSet for managing projects.
@@ -36,58 +63,6 @@ class ProjectViewSet(viewsets.ModelViewSet):
     """
     permission_classes = [IsAuthenticated, IsOwner]
     parser_classes = [MultiPartParser, FormParser]
-    
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                'id',
-                OpenApiTypes.UUID,
-                OpenApiParameter.PATH,
-                description='Project ID'
-            )
-        ]
-    )
-    def retrieve(self, request, *args, **kwargs):
-        return super().retrieve(request, *args, **kwargs)
-    
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                'id',
-                OpenApiTypes.UUID,
-                OpenApiParameter.PATH,
-                description='Project ID'
-            )
-        ]
-    )
-    def update(self, request, *args, **kwargs):
-        return super().update(request, *args, **kwargs)
-    
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                'id',
-                OpenApiTypes.UUID,
-                OpenApiParameter.PATH,
-                description='Project ID'
-            )
-        ]
-    )
-    def partial_update(self, request, *args, **kwargs):
-        return super().partial_update(request, *args, **kwargs)
-    
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                'id',
-                OpenApiTypes.UUID,
-                OpenApiParameter.PATH,
-                description='Project ID'
-            )
-        ]
-    )
-    def destroy(self, request, *args, **kwargs):
-        return super().destroy(request, *args, **kwargs)
     
     def get_queryset(self):
         """Return projects for the authenticated user."""
@@ -182,6 +157,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
         
         return Response({'message': 'Ordre mis à jour'}, status=status.HTTP_200_OK)
     
+    @extend_schema(
+        parameters=[
+            OpenApiParameter('id', OpenApiTypes.UUID, OpenApiParameter.PATH, description='Project ID')
+        ]
+    )
     @action(detail=True, methods=['post'])
     def toggle_featured(self, request, pk=None):
         """
@@ -198,6 +178,11 @@ class ProjectViewSet(viewsets.ModelViewSet):
             'is_featured': project.is_featured
         }, status=status.HTTP_200_OK)
     
+    @extend_schema(
+        parameters=[
+            OpenApiParameter('id', OpenApiTypes.UUID, OpenApiParameter.PATH, description='Project ID')
+        ]
+    )
     @action(detail=True, methods=['delete'])
     def delete_cover(self, request, pk=None):
         """

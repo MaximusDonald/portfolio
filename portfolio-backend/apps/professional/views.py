@@ -5,6 +5,8 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from drf_spectacular.utils import extend_schema, extend_schema_view
+from drf_spectacular.openapi import OpenApiParameter, OpenApiTypes
 
 from apps.core.permissions import IsOwner
 from apps.core.enums import Visibility
@@ -19,6 +21,35 @@ from .serializers import (
 )
 
 
+# ========== EXPERIENCE VIEWSET ==========
+@extend_schema_view(
+    list=extend_schema(description="Liste de toutes mes expériences professionnelles"),
+    retrieve=extend_schema(
+        description="Récupérer une expérience par son ID",
+        parameters=[
+            OpenApiParameter('id', OpenApiTypes.UUID, OpenApiParameter.PATH, description='Experience ID')
+        ]
+    ),
+    create=extend_schema(description="Créer une nouvelle expérience"),
+    update=extend_schema(
+        description="Mettre à jour une expérience",
+        parameters=[
+            OpenApiParameter('id', OpenApiTypes.UUID, OpenApiParameter.PATH, description='Experience ID')
+        ]
+    ),
+    partial_update=extend_schema(
+        description="Mise à jour partielle d'une expérience",
+        parameters=[
+            OpenApiParameter('id', OpenApiTypes.UUID, OpenApiParameter.PATH, description='Experience ID')
+        ]
+    ),
+    destroy=extend_schema(
+        description="Supprimer une expérience",
+        parameters=[
+            OpenApiParameter('id', OpenApiTypes.UUID, OpenApiParameter.PATH, description='Experience ID')
+        ]
+    )
+)
 class ExperienceViewSet(viewsets.ModelViewSet):
     """
     ViewSet for managing professional experiences.
@@ -100,6 +131,35 @@ class ExperienceViewSet(viewsets.ModelViewSet):
         return Response({'message': 'Ordre mis à jour'}, status=status.HTTP_200_OK)
 
 
+# ========== TRAINING VIEWSET ==========
+@extend_schema_view(
+    list=extend_schema(description="Liste de toutes mes formations complémentaires"),
+    retrieve=extend_schema(
+        description="Récupérer une formation par son ID",
+        parameters=[
+            OpenApiParameter('id', OpenApiTypes.UUID, OpenApiParameter.PATH, description='Training ID')
+        ]
+    ),
+    create=extend_schema(description="Créer une nouvelle formation"),
+    update=extend_schema(
+        description="Mettre à jour une formation",
+        parameters=[
+            OpenApiParameter('id', OpenApiTypes.UUID, OpenApiParameter.PATH, description='Training ID')
+        ]
+    ),
+    partial_update=extend_schema(
+        description="Mise à jour partielle d'une formation",
+        parameters=[
+            OpenApiParameter('id', OpenApiTypes.UUID, OpenApiParameter.PATH, description='Training ID')
+        ]
+    ),
+    destroy=extend_schema(
+        description="Supprimer une formation",
+        parameters=[
+            OpenApiParameter('id', OpenApiTypes.UUID, OpenApiParameter.PATH, description='Training ID')
+        ]
+    )
+)
 class TrainingViewSet(viewsets.ModelViewSet):
     """
     ViewSet for managing training/formations.
