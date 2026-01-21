@@ -468,3 +468,9 @@ portfolio-frontend/
 ├── vite.config.js
 └── README.md
 
+
+
+src/pages/admin/Dashboard.jsx         (IMPLÉMENTATION COMPLÈTE)
+src/components/admin/StatCard.jsx     (À CRÉER)
+src/components/admin/QuickActions.jsx (À CRÉER)
+src/hooks/useStats.js                 (À CRÉER - optionnel)
