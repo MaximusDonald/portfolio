@@ -162,19 +162,23 @@ class Proof(BaseModel, VisibilityMixin, OwnedModel):
         if self.file_name:
             return self.file_name.split('.')[-1].lower()
         return ''
-    
+
+    @property
     def is_image(self):
         """Check if proof is an image."""
         return self.proof_type == ProofType.IMAGE
-    
+
+    @property
     def is_video(self):
         """Check if proof is a video."""
         return self.proof_type == ProofType.VIDEO
-    
+
+    @property
     def is_pdf(self):
         """Check if proof is a PDF."""
         return self.proof_type == ProofType.PDF
-    
+
+    @property
     def is_document(self):
         """Check if proof is a document."""
         return self.proof_type == ProofType.DOCUMENT

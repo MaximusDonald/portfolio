@@ -44,23 +44,18 @@ export function Sidebar({ isOpen, onClose }) {
       icon: Award,
     },
     {
-      name: 'Diplômes',
-      href: '/admin/diplomas',
+      name: 'Education',
+      href: '/admin/education',
       icon: GraduationCap,
     },
     {
-      name: 'Expériences',
-      href: '/admin/experiences',
+      name: 'Professionel',
+      href: '/admin/professional',
       icon: Briefcase,
     },
     {
-      name: 'Formations',
-      href: '/admin/trainings',
-      icon: BookOpen,
-    },
-    {
       name: 'Liens Recruteur',
-      href: '/admin/recruiter-links',
+      href: '/admin/recruiter-access',
       icon: Link2,
     },
     {

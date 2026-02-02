@@ -16,7 +16,8 @@ from .serializers import (
     UserSerializer,
     RegisterSerializer,
     ChangePasswordSerializer,
-    UpdateUserSerializer
+    UpdateUserSerializer,
+    DeleteAccountSerializer
 )
 
 User = get_user_model()
@@ -169,3 +170,28 @@ def verify_token_view(request):
         'valid': True,
         'user': UserSerializer(request.user).data
     }, status=status.HTTP_200_OK)
+
+
+class DeleteAccountRequestSerializer(s.Serializer):
+    password = s.CharField(help_text="Mot de passe de confirmation")
+
+
+class DeleteAccountResponseSerializer(s.Serializer):
+    message = s.CharField()
+
+
+@extend_schema(
+    request=DeleteAccountRequestSerializer,
+    responses={200: DeleteAccountResponseSerializer},
+    description="Supprimer définitivement le compte de l'utilisateur connecté (confirmation par mot de passe)."
+)
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def delete_account_view(request):
+    serializer = DeleteAccountSerializer(data=request.data, context={'request': request})
+    serializer.is_valid(raise_exception=True)
+
+    user = request.user
+    user.delete()
+
+    return Response({'message': 'Compte supprimé avec succès'}, status=status.HTTP_200_OK)

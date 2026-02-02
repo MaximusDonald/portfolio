@@ -27,13 +27,13 @@ export function QuickActions() {
     },
     {
       label: 'Ajouter Diplôme',
-      href: '/admin/diplomas/new',
+      href: '/admin/education/diplomas/new',
       icon: GraduationCap,
       color: 'purple',
     },
     {
       label: 'Ajouter Expérience',
-      href: '/admin/experiences/new',
+      href: '/admin/professional/experiences/new',
       icon: Briefcase,
       color: 'orange',
     },

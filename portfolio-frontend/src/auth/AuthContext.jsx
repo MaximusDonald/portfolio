@@ -1,5 +1,5 @@
 import { createContext, useState, useEffect, useCallback } from 'react'
-import { authAPI, isAuthenticated as checkAuth } from '@/api'
+import { authAPI, clearTokens, isAuthenticated as checkAuth } from '@/api'
 
 /**
  * Context pour l'authentification
@@ -36,6 +36,7 @@ export function AuthProvider({ children }) {
           setUser(data.user)
         } catch (error) {
           console.error('Token invalide:', error)
+          clearTokens()
           setUser(null)
         }
       }

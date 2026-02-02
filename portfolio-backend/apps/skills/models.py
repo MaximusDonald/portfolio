@@ -129,6 +129,7 @@ class Skill(BaseModel, OwnedModel):
             'trainings': list(self.related_trainings.values('id', 'title'))
         }
     
+    @property
     def has_justifications(self):
         """Check if skill has at least one justification."""
         return self.get_justifications_count() > 0

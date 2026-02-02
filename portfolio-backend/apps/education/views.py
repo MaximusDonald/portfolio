@@ -10,6 +10,7 @@ from drf_spectacular.openapi import OpenApiParameter, OpenApiTypes
 
 from apps.core.permissions import IsOwner, VisibilityPermission
 from apps.core.enums import Visibility
+from apps.core.utils import get_allowed_visibilities
 from .models import Diploma, Certification
 from .serializers import (
     DiplomaSerializer,
@@ -96,7 +97,8 @@ class DiplomaViewSet(viewsets.ModelViewSet):
         
         diplomas = Diploma.objects.filter(
             user_id=user_id,
-            visibility=Visibility.PUBLIC
+            visibility__in=get_allowed_visibilities(request),
+            is_published=True,
         ).order_by('display_order', '-end_date')
         
         serializer = DiplomaPublicSerializer(diplomas, many=True)
@@ -129,6 +131,23 @@ class DiplomaViewSet(viewsets.ModelViewSet):
                 continue
         
         return Response({'message': 'Ordre mis à jour'}, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter('id', OpenApiTypes.UUID, OpenApiParameter.PATH, description='Diploma ID')
+        ]
+    )
+    @action(detail=True, methods=['post'])
+    def toggle_publish(self, request, pk=None):
+        """Toggle published status of a diploma."""
+        diploma = self.get_object()
+        diploma.is_published = not diploma.is_published
+        diploma.save(update_fields=['is_published'])
+
+        return Response({
+            'message': 'Statut de publication modifié',
+            'is_published': diploma.is_published
+        }, status=status.HTTP_200_OK)
 
 
 # ========== CERTIFICATION VIEWSET ==========
@@ -171,6 +190,7 @@ class CertificationViewSet(viewsets.ModelViewSet):
     - PATCH/PUT /api/education/certifications/{id}/ - Update certification
     - DELETE /api/education/certifications/{id}/ - Delete certification
     - GET /api/education/certifications/public/ - List public certifications
+    - POST /api/education/certifications/{id}/toggle_publish/ - Toggle publish status of a certification
     """
     permission_classes = [IsAuthenticated, IsOwner]
     
@@ -206,7 +226,8 @@ class CertificationViewSet(viewsets.ModelViewSet):
         
         certifications = Certification.objects.filter(
             user_id=user_id,
-            visibility=Visibility.PUBLIC
+            visibility__in=get_allowed_visibilities(request),
+            is_published=True,
         ).order_by('display_order', '-issue_date')
         
         serializer = CertificationPublicSerializer(certifications, many=True)
@@ -239,3 +260,20 @@ class CertificationViewSet(viewsets.ModelViewSet):
                 continue
         
         return Response({'message': 'Ordre mis à jour'}, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter('id', OpenApiTypes.UUID, OpenApiParameter.PATH, description='Certification ID')
+        ]
+    )
+    @action(detail=True, methods=['post'])
+    def toggle_publish(self, request, pk=None):
+        """Toggle published status of a certification."""
+        cert = self.get_object()
+        cert.is_published = not cert.is_published
+        cert.save(update_fields=['is_published'])
+
+        return Response({
+            'message': 'Statut de publication modifié',
+            'is_published': cert.is_published
+        }, status=status.HTTP_200_OK)

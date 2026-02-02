@@ -107,14 +107,14 @@ class ProofAdmin(BaseModelAdmin):
     
     def file_preview(self, obj):
         """Display file preview in list."""
-        if obj.is_image() and obj.file:
+        if obj.is_image and obj.file:
             return format_html(
                 '<img src="{}" width="60" height="60" style="object-fit: cover; border-radius: 5px;" />',
                 obj.file.url
             )
-        elif obj.is_pdf():
+        elif obj.is_pdf:
             return '📄 PDF'
-        elif obj.is_video():
+        elif obj.is_video:
             return '🎥 Vidéo'
         else:
             return '📎 Document'
@@ -122,7 +122,7 @@ class ProofAdmin(BaseModelAdmin):
     
     def file_preview_large(self, obj):
         """Display large file preview in detail."""
-        if obj.is_image() and obj.file:
+        if obj.is_image and obj.file:
             return format_html(
                 '<img src="{}" width="400" style="border-radius: 10px;" />',
                 obj.file.url

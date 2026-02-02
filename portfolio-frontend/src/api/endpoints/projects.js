@@ -1,4 +1,4 @@
-import apiClient, { createFormDataClient } from '../client'
+import apiClient, { createFormDataClient, unwrapListResponse } from '../client'
 
 /**
  * Endpoints pour la gestion des projets
@@ -10,7 +10,7 @@ export const projectsAPI = {
    */
   getAll: async () => {
     const response = await apiClient.get('/projects/')
-    return response.data
+    return unwrapListResponse(response.data)
   },
 
   /**
@@ -50,7 +50,7 @@ export const projectsAPI = {
    * PATCH /api/projects/{id}/
    */
   update: async (id, data) => {
-    // Si une image de couverture est fournie, utiliser FormData
+    // Si une image de couverture est fournie (nouveau fichier), utiliser FormData
     if (data.cover_image instanceof File) {
       const formData = new FormData()
       Object.keys(data).forEach(key => {
@@ -64,7 +64,9 @@ export const projectsAPI = {
       return response.data
     }
 
-    const response = await apiClient.patch(`/projects/${id}/`, data)
+    // Sinon, on envoie le JSON sans le champ cover_image pour ne pas écraser l'existante avec null
+    const { cover_image, ...cleanData } = data
+    const response = await apiClient.patch(`/projects/${id}/`, cleanData)
     return response.data
   },
 
@@ -81,22 +83,22 @@ export const projectsAPI = {
    * Récupérer les projets publics d'un utilisateur
    * GET /api/projects/public/?user_id={userId}
    */
-  getPublic: async (userId) => {
+  getPublic: async (userId, params = {}) => {
     const response = await apiClient.get('/projects/public/', {
-      params: { user_id: userId }
+      params: { user_id: userId, ...params }
     })
-    return response.data
+    return unwrapListResponse(response.data)
   },
 
   /**
    * Récupérer les projets mis en avant
    * GET /api/projects/featured/?user_id={userId}
    */
-  getFeatured: async (userId) => {
+  getFeatured: async (userId, params = {}) => {
     const response = await apiClient.get('/projects/featured/', {
-      params: { user_id: userId }
+      params: { user_id: userId, ...params }
     })
-    return response.data
+    return unwrapListResponse(response.data)
   },
 
   /**
@@ -116,6 +118,15 @@ export const projectsAPI = {
    */
   toggleFeatured: async (id) => {
     const response = await apiClient.post(`/projects/${id}/toggle_featured/`)
+    return response.data
+  },
+
+  /**
+   * Basculer le statut "publié"
+   * POST /api/projects/{id}/toggle_publish/
+   */
+  togglePublish: async (id) => {
+    const response = await apiClient.post(`/projects/${id}/toggle_publish/`)
     return response.data
   },
 

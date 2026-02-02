@@ -6,86 +6,72 @@
 @tailwind utilities;
 
 /* ============================================
-   CUSTOM CSS VARIABLES - LIGHT MODE (défaut)
+   CUSTOM CSS VARIABLES 
    ============================================ */
 :root {
-  /* Couleurs principales - Palette Bleu/Violet (moderne) */
-  --color-primary-50: #f0f4ff;
-  --color-primary-100: #e0e8ff;
-  --color-primary-200: #c7d7fe;
-  --color-primary-300: #a5b9fc;
-  --color-primary-400: #8191f8;
-  --color-primary-500: #6366f1; /* Couleur principale */
-  --color-primary-600: #4f46e5;
-  --color-primary-700: #4338ca;
-  --color-primary-800: #3730a3;
-  --color-primary-900: #312e81;
+  /* LIGHT MODE - Sophisticated Tech */
+  --bg-deep: #ffffff;
+  --bg-page: #f8fafc;
+  --bg-surface: #ffffff;
+  --bg-card: #ffffff;
+  --bg-accent: #f1f5f9;
 
-  /* Couleurs sémantiques */
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-error: #ef4444;
-  --color-info: #3b82f6;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --text-tertiary: #94a3b8;
+  --text-accent: #10b981;
+  /* Main Emerald */
 
-  /* Couleurs de texte */
-  --text-primary: #1f2937;
-  --text-secondary: #6b7280;
-  --text-tertiary: #9ca3af;
+  --border-dim: #e2e8f0;
+  --border-glow: rgba(16, 185, 129, 0.1);
+  --shadow-glow: 0 10px 40px -10px rgba(0, 0, 0, 0.05);
 
-  /* Couleurs de fond */
-  --bg-primary: #ffffff;
-  --bg-secondary: #f9fafb;
-  --bg-tertiary: #f3f4f6;
+  /* Primary Palette */
+  --color-primary-400: #34d399;
+  --color-primary-500: #10b981;
+  --color-primary-600: #059669;
 
-  /* Bordures */
-  --border-color: #e5e7eb;
-  --border-radius: 0.5rem;
-
-  /* Ombres */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  /* Skill Level Colors */
+  --lvl-beginner: #94a3b8;
+  --lvl-intermediate: #3b82f6;
+  --lvl-advanced: #6366f1;
+  --lvl-expert: #10b981;
 }
 
-/* ============================================
-   DARK MODE
-   ============================================ */
 .dark {
-  /* Couleurs principales - Ajustées pour le dark mode */
-  --color-primary-50: #312e81;
-  --color-primary-100: #3730a3;
-  --color-primary-200: #4338ca;
-  --color-primary-300: #4f46e5;
-  --color-primary-400: #6366f1;
-  --color-primary-500: #8191f8; /* Couleur principale en dark */
-  --color-primary-600: #a5b9fc;
-  --color-primary-700: #c7d7fe;
-  --color-primary-800: #e0e8ff;
-  --color-primary-900: #f0f4ff;
+  /* DARK MODE - Tech Alchemist */
+  --bg-deep: #050505;
+  --bg-page: #0a0a0a;
+  --bg-surface: #0a0a0a;
+  --bg-card: #111111;
+  --bg-accent: #171717;
 
-  /* Couleurs sémantiques (légèrement plus vives) */
-  --color-success: #34d399;
-  --color-warning: #f59e0b;
-  --color-error: #f87171;
-  --color-info: #60a5fa;
+  --text-primary: #f5f5f5;
+  --text-secondary: #a3a3a3;
+  --text-tertiary: #525252;
+  --text-accent: #10b981;
 
-  /* Couleurs de texte */
-  --text-primary: #f9fafb;
-  --text-secondary: #d1d5db;
-  --text-tertiary: #9ca3af;
+  --border-dim: #262626;
+  --border-glow: rgba(16, 185, 129, 0.2);
+  --shadow-glow: 0 0 40px -10px rgba(16, 185, 129, 0.2);
 
-  /* Couleurs de fond */
-  --bg-primary: #111827;
-  --bg-secondary: #1f2937;
-  --bg-tertiary: #374151;
+  /* Skill Level Colors (Slightly more vibrant for dark) */
+  --lvl-beginner: #525252;
+  --lvl-intermediate: #60a5fa;
+  --lvl-advanced: #818cf8;
+  --lvl-expert: #10b981;
+}
 
-  /* Bordures */
-  --border-color: #374151;
+.public-template-minimal {
+  --text-accent: #2563eb;
+  --border-glow: rgba(37, 99, 235, 0.10);
+  --shadow-glow: 0 10px 30px -12px rgba(0, 0, 0, 0.08);
+}
 
-  /* Ombres */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5);
+.dark.public-template-minimal {
+  --text-accent: #60a5fa;
+  --border-glow: rgba(96, 165, 250, 0.20);
+  --shadow-glow: 0 0 36px -14px rgba(96, 165, 250, 0.18);
 }
 
 /* ============================================
@@ -97,29 +83,17 @@
   }
 
   body {
-    @apply bg-[var(--bg-primary)] text-[var(--text-primary)] antialiased;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    transition: background-color 0.2s ease, color 0.2s ease;
+    @apply bg-[var(--bg-deep)] text-[var(--text-primary)] antialiased transition-colors duration-700;
+    font-family: 'Outfit', 'Inter', system-ui, sans-serif;
   }
 
-  h1, h2, h3, h4, h5, h6 {
-    @apply font-semibold tracking-tight;
-  }
-
-  h1 {
-    @apply text-4xl;
-  }
-
-  h2 {
-    @apply text-3xl;
-  }
-
-  h3 {
-    @apply text-2xl;
-  }
-
-  a {
-    @apply transition-colors duration-200;
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-bold tracking-tight uppercase;
   }
 }
 
@@ -127,72 +101,70 @@
    CUSTOM UTILITIES
    ============================================ */
 @layer utilities {
-  /* Conteneur principal */
-  .container-custom {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+  .section-container {
+    @apply relative py-24 px-6 md:py-40;
   }
 
-  /* Card standard */
-  .card {
-    @apply bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-[var(--border-radius)] shadow-[var(--shadow-sm)];
+  .tech-card {
+    @apply bg-[var(--bg-card)] border border-[var(--border-dim)] hover:border-[var(--text-accent)] transition-all duration-500 rounded-[2rem] shadow-[var(--shadow-glow)];
   }
 
-  /* Texte avec couleur secondaire */
-  .text-secondary {
-    @apply text-[var(--text-secondary)];
+  .glass-card {
+    @apply backdrop-blur-xl bg-white/5 dark:bg-black/20 border border-white/10 dark:border-white/5;
   }
 
-  /* Texte avec couleur tertiaire */
-  .text-tertiary {
-    @apply text-[var(--text-tertiary)];
+  .gradient-text {
+    @apply text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-cyan-400;
   }
 
-  /* Animation de chargement */
-  .loading-skeleton {
-    @apply animate-pulse bg-[var(--bg-tertiary)] rounded;
+  .animate-reveal {
+    animation: reveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
+  @keyframes reveal {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-bounce-slow {
+    animation: bounce 3s infinite;
+  }
+
+  @keyframes bounce {
+
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+
+    50% {
+      transform: translateY(-10px);
+    }
   }
 }
 
 /* ============================================
-   ANIMATIONS CUSTOM
-   ============================================ */
-@keyframes shimmer {
-  0% {
-    background-position: -1000px 0;
-  }
-  100% {
-    background-position: 1000px 0;
-  }
-}
-
-.shimmer {
-  animation: shimmer 2s infinite linear;
-  background: linear-gradient(
-    to right,
-    var(--bg-secondary) 0%,
-    var(--bg-tertiary) 20%,
-    var(--bg-secondary) 40%,
-    var(--bg-secondary) 100%
-  );
-  background-size: 1000px 100%;
-}
-
-/* ============================================
-   SCROLLBAR CUSTOM
+   SCROLLBAR
    ============================================ */
 ::-webkit-scrollbar {
   width: 8px;
-  height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-[var(--bg-secondary)];
+  @apply bg-[var(--bg-deep)];
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-[var(--text-tertiary)] rounded-full;
+  @apply bg-neutral-300 dark:bg-neutral-800 rounded-full border-2 border-solid border-transparent bg-clip-content;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-[var(--text-secondary)];
+  @apply bg-neutral-400 dark:bg-neutral-700;
 }

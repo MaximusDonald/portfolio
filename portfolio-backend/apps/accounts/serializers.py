@@ -139,6 +139,22 @@ class ChangePasswordSerializer(serializers.Serializer):
         return user
 
 
+class DeleteAccountSerializer(serializers.Serializer):
+    """Serializer for account deletion confirmation."""
+
+    password = serializers.CharField(
+        required=True,
+        write_only=True,
+        style={'input_type': 'password'}
+    )
+
+    def validate_password(self, value):
+        user = self.context['request'].user
+        if not user.check_password(value):
+            raise serializers.ValidationError('Mot de passe incorrect.')
+        return value
+
+
 class UpdateUserSerializer(serializers.ModelSerializer):
     """
     Serializer for updating user information.

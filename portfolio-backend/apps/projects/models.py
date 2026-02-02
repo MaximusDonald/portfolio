@@ -64,6 +64,7 @@ class Project(BaseModel, VisibilityMixin, OwnedModel):
     team_size = models.PositiveIntegerField(
         blank=True,
         null=True,
+        default=1,
         verbose_name='Taille de l\'équipe',
         help_text='Nombre de personnes dans l\'équipe (laisser vide si projet solo)'
     )
@@ -171,6 +172,12 @@ class Project(BaseModel, VisibilityMixin, OwnedModel):
         verbose_name='Projet mis en avant',
         help_text='Cocher pour mettre ce projet en avant sur le portfolio'
     )
+
+    is_published = models.BooleanField(
+        default=True,
+        verbose_name='Publié',
+        help_text='Si désactivé, le contenu reste en brouillon et n\'apparaît pas publiquement.'
+    )
     
     display_order = models.PositiveIntegerField(
         default=0,
@@ -217,6 +224,7 @@ class Project(BaseModel, VisibilityMixin, OwnedModel):
         achievements = self.achievements.replace('\n', '|').replace('•', '|').replace('-', '|').split('|')
         return [achievement.strip() for achievement in achievements if achievement.strip()]
     
+    @property
     def has_links(self):
         """Check if project has at least one link."""
         return any([self.github_url, self.demo_url, self.video_url, self.documentation_url])

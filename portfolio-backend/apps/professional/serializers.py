@@ -39,6 +39,7 @@ class ExperienceSerializer(BaseSerializer):
             'technologies_list',
             'visibility',
             'display_order',
+            'is_published',
             'created_at',
             'updated_at',
         ]
@@ -112,6 +113,7 @@ class ExperienceCreateUpdateSerializer(serializers.ModelSerializer):
             'technologies',
             'visibility',
             'display_order',
+            'is_published',
         ]
     
     def validate_position(self, value):
@@ -125,6 +127,52 @@ class ExperienceCreateUpdateSerializer(serializers.ModelSerializer):
         if len(value) < 2:
             raise serializers.ValidationError('Le nom de l\'entreprise doit contenir au moins 2 caractères.')
         return value
+
+    def validate(self, attrs):
+        """Validate experience dates."""
+        start_date = attrs.get('start_date')
+        end_date = attrs.get('end_date')
+        is_current = attrs.get('is_current', False)
+
+        # If is_current, end_date should be empty
+        if is_current and end_date:
+            raise serializers.ValidationError({
+                'end_date': 'La date de fin doit être vide pour un poste actuel'
+            })
+
+        # If not current, end_date should be provided
+        if not is_current and not end_date:
+            raise serializers.ValidationError({
+                'end_date': 'La date de fin est requise pour un poste terminé'
+            })
+
+        # Validate date format
+        if start_date and len(start_date) != 7:
+            raise serializers.ValidationError({
+                'start_date': 'Format requis: YYYY-MM'
+            })
+
+        if end_date and len(end_date) != 7:
+            raise serializers.ValidationError({
+                'end_date': 'Format requis: YYYY-MM'
+            })
+
+        # Check that end_date is after start_date
+        if end_date and start_date and end_date < start_date:
+            raise serializers.ValidationError({
+                'end_date': 'La date de fin doit être postérieure à la date de début'
+            })
+
+        return attrs
+
+    def to_internal_value(self, data):
+        """Convert empty strings to sane values for optional fields."""
+        new_data = data.copy()
+
+        if 'display_order' in new_data and new_data['display_order'] == '':
+            new_data['display_order'] = 0
+
+        return super().to_internal_value(new_data)
 
 
 class ExperiencePublicSerializer(serializers.ModelSerializer):
@@ -183,6 +231,7 @@ class TrainingSerializer(BaseSerializer):
             'certificate_url',
             'visibility',
             'display_order',
+            'is_published',
             'created_at',
             'updated_at',
         ]
@@ -248,6 +297,7 @@ class TrainingCreateUpdateSerializer(serializers.ModelSerializer):
             'certificate_url',
             'visibility',
             'display_order',
+            'is_published',
         ]
     
     def validate_title(self, value):
@@ -255,6 +305,49 @@ class TrainingCreateUpdateSerializer(serializers.ModelSerializer):
         if len(value) < 5:
             raise serializers.ValidationError('Le titre doit contenir au moins 5 caractères.')
         return value
+
+    def validate(self, attrs):
+        """Validate training dates."""
+        start_date = attrs.get('start_date')
+        end_date = attrs.get('end_date')
+        is_ongoing = attrs.get('is_ongoing', False)
+
+        # If is_ongoing, end_date should be empty
+        if is_ongoing and end_date:
+            raise serializers.ValidationError({
+                'end_date': 'La date de fin doit être vide pour une formation en cours'
+            })
+
+        # Validate date format
+        if start_date and len(start_date) != 7:
+            raise serializers.ValidationError({
+                'start_date': 'Format requis: YYYY-MM'
+            })
+
+        if end_date and len(end_date) != 7:
+            raise serializers.ValidationError({
+                'end_date': 'Format requis: YYYY-MM'
+            })
+
+        # Check that end_date is after start_date
+        if end_date and start_date and end_date < start_date:
+            raise serializers.ValidationError({
+                'end_date': 'La date de fin doit être postérieure à la date de début'
+            })
+
+        return attrs
+
+    def to_internal_value(self, data):
+        """Convert empty strings to sane values for optional fields."""
+        new_data = data.copy()
+
+        if 'duration_hours' in new_data and new_data['duration_hours'] == '':
+            new_data['duration_hours'] = None
+
+        if 'display_order' in new_data and new_data['display_order'] == '':
+            new_data['display_order'] = 0
+
+        return super().to_internal_value(new_data)
 
 
 class TrainingPublicSerializer(serializers.ModelSerializer):

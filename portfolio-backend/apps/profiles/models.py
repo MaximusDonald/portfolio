@@ -4,6 +4,9 @@ Profile model for portfolio information
 from django.db import models
 from django.conf import settings
 from django.core.validators import URLValidator, RegexValidator
+from django.core.exceptions import ValidationError
+import slugify
+
 
 from apps.core.models import BaseModel
 from apps.core.utils import generate_filename
@@ -23,6 +26,16 @@ class Profile(BaseModel):
         on_delete=models.CASCADE,
         related_name='profile',
         verbose_name='Utilisateur'
+    )
+    
+    
+    portfolio_slug = models.SlugField(
+        max_length=120,
+        unique=True,
+        blank=True,
+        null=True,
+        verbose_name="Slug du portfolio",
+        help_text="Utilisé dans l'URL publique (ex: /ton-nom). Laissez vide pour génération automatique."
     )
     
     # ===== INFORMATIONS PERSONNELLES =====
@@ -154,6 +167,19 @@ class Profile(BaseModel):
         help_text='Afficher la localisation sur le portfolio public'
     )
     
+    PUBLIC_TEMPLATE_CHOICES = [
+        ('tech_alchemist', 'Tech Alchemist'),
+        ('minimal', 'Minimal'),
+    ]
+
+    public_template = models.CharField(
+        max_length=50,
+        choices=PUBLIC_TEMPLATE_CHOICES,
+        default='tech_alchemist',
+        verbose_name='Template public',
+        help_text='Template utilisé pour l\'affichage du portfolio public'
+    )
+    
     # ===== MÉTADONNÉES =====
     
     is_profile_complete = models.BooleanField(
@@ -167,6 +193,75 @@ class Profile(BaseModel):
         verbose_name='Nombre de vues',
         help_text='Nombre de fois que le profil a été consulté'
     )
+
+    # ===== CUSTOM EMPTY MESSAGES =====
+
+    empty_about_text = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name='Message Section À Propos vide',
+        help_text='Message affiché quand la biographie est vide.'
+    )
+
+    empty_skills_text = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name='Message Section Compétences vide',
+        help_text='Message affiché quand aucune compétence n\'est listée.'
+    )
+
+    empty_experience_text = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name='Message Section Expériences vide',
+        help_text='Message affiché quand aucune expérience n\'est listée.'
+    )
+
+    empty_projects_text = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name='Message Section Projets vide',
+        help_text='Message affiché quand aucun projet n\'est listé.'
+    )
+
+    empty_education_text = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name='Message Section Éducation vide',
+        help_text='Message affiché quand aucune formation n\'est listée.'
+    )
+
+    # ===== CUSTOM TRAITS (About Section) =====
+
+    trait_1_title = models.CharField(
+        max_length=50,
+        default='Passionné',
+        verbose_name='Titre Trait 1',
+    )
+    trait_1_description = models.TextField(
+        default='Fasciné par les systèmes intelligents et leur capacité à résoudre des problèmes complexes.',
+        verbose_name='Description Trait 1',
+    )
+
+    trait_2_title = models.CharField(
+        max_length=50,
+        default='Déterminé',
+        verbose_name='Titre Trait 2',
+    )
+    trait_2_description = models.TextField(
+        default='Toujours en quête de nouveaux défis pour repousser les limites de mes compétences.',
+        verbose_name='Description Trait 2',
+    )
+
+    trait_3_title = models.CharField(
+        max_length=50,
+        default='Innovant',
+        verbose_name='Titre Trait 3',
+    )
+    trait_3_description = models.TextField(
+        default='Toujours à l\'affût des dernières avancées en IA pour créer des solutions innovantes.',
+        verbose_name='Description Trait 3',
+    )
     
     class Meta:
         verbose_name = 'Profil'
@@ -176,6 +271,17 @@ class Profile(BaseModel):
     
     def __str__(self):
         return f"Profil de {self.user.get_full_name() or self.user.email}"
+    
+    def clean(self):
+        if self.portfolio_slug:
+            # Vérifier unicité manuellement (au cas où unique=True ne suffise pas)
+            qs = Profile.objects.filter(portfolio_slug=self.portfolio_slug)
+            if self.pk:
+                qs = qs.exclude(pk=self.pk)
+            if qs.exists():
+                raise ValidationError({
+                    'portfolio_slug': "Ce slug est déjà utilisé par un autre profil."
+                })
     
     def get_display_email(self):
         """Return the email to display (professional or user email)."""
@@ -214,9 +320,32 @@ class Profile(BaseModel):
         self.save(update_fields=['profile_views'])
     
     def save(self, *args, **kwargs):
-        """Override save to auto-check completeness."""
+        if not self.portfolio_slug:
+            if not self.user.get_full_name():
+                # Fallback très basique si vraiment rien
+                base = self.user.first_name or f"user-{self.user.id}"
+            else:
+                base = self.user.get_full_name() or self.user.email.split('@')[0]
+
+            base_slug = slugify.slugify(base.strip())
+            slug = base_slug
+            counter = 1
+
+            while Profile.objects.filter(portfolio_slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+
+            self.portfolio_slug = slug
+
         super().save(*args, **kwargs)
-        
-        # Check completeness after save (avoid recursion)
+
+        # Check profile completeness after saving (override to avoid recursion)
         if 'update_fields' not in kwargs:
             self.check_profile_completeness()
+            
+    @property
+    def public_url(self):
+        if self.portfolio_slug:
+            return f"/{self.portfolio_slug}"
+        # Fallback temporaire pour anciens profils (à retirer après migration complète)
+        return f"/u/{self.user.username}"

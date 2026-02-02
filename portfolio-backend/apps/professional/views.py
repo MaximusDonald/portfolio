@@ -10,6 +10,7 @@ from drf_spectacular.openapi import OpenApiParameter, OpenApiTypes
 
 from apps.core.permissions import IsOwner
 from apps.core.enums import Visibility
+from apps.core.utils import get_allowed_visibilities
 from .models import Experience, Training
 from .serializers import (
     ExperienceSerializer,
@@ -96,7 +97,8 @@ class ExperienceViewSet(viewsets.ModelViewSet):
         
         experiences = Experience.objects.filter(
             user_id=user_id,
-            visibility=Visibility.PUBLIC
+            visibility__in=get_allowed_visibilities(request),
+            is_published=True,
         ).order_by('display_order', '-start_date')
         
         serializer = ExperiencePublicSerializer(experiences, many=True)
@@ -129,6 +131,23 @@ class ExperienceViewSet(viewsets.ModelViewSet):
                 continue
         
         return Response({'message': 'Ordre mis à jour'}, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter('id', OpenApiTypes.UUID, OpenApiParameter.PATH, description='Experience ID')
+        ]
+    )
+    @action(detail=True, methods=['post'])
+    def toggle_publish(self, request, pk=None):
+        """Toggle published status of an experience."""
+        exp = self.get_object()
+        exp.is_published = not exp.is_published
+        exp.save(update_fields=['is_published'])
+
+        return Response({
+            'message': 'Statut de publication modifié',
+            'is_published': exp.is_published
+        }, status=status.HTTP_200_OK)
 
 
 # ========== TRAINING VIEWSET ==========
@@ -171,6 +190,7 @@ class TrainingViewSet(viewsets.ModelViewSet):
     - PATCH/PUT /api/professional/trainings/{id}/ - Update training
     - DELETE /api/professional/trainings/{id}/ - Delete training
     - GET /api/professional/trainings/public/ - List public trainings
+    - POST /api/professional/trainings/{id}/toggle_publish/ - Toggle publish status
     """
     permission_classes = [IsAuthenticated, IsOwner]
     
@@ -206,7 +226,8 @@ class TrainingViewSet(viewsets.ModelViewSet):
         
         trainings = Training.objects.filter(
             user_id=user_id,
-            visibility=Visibility.PUBLIC
+            visibility__in=get_allowed_visibilities(request),
+            is_published=True,
         ).order_by('display_order', '-start_date')
         
         serializer = TrainingPublicSerializer(trainings, many=True)
@@ -239,3 +260,20 @@ class TrainingViewSet(viewsets.ModelViewSet):
                 continue
         
         return Response({'message': 'Ordre mis à jour'}, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter('id', OpenApiTypes.UUID, OpenApiParameter.PATH, description='Training ID')
+        ]
+    )
+    @action(detail=True, methods=['post'])
+    def toggle_publish(self, request, pk=None):
+        """Toggle published status of a training."""
+        training = self.get_object()
+        training.is_published = not training.is_published
+        training.save(update_fields=['is_published'])
+
+        return Response({
+            'message': 'Statut de publication modifié',
+            'is_published': training.is_published
+        }, status=status.HTTP_200_OK)

@@ -103,4 +103,13 @@ export const authAPI = {
     })
     return response.data
   },
+
+  /**
+   * Supprimer définitivement le compte
+   * POST /api/auth/delete-account/
+   */
+  deleteAccount: async (password) => {
+    const response = await apiClient.post('/auth/delete-account/', { password })
+    return response.data
+  },
 }

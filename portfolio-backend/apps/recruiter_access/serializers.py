@@ -13,7 +13,6 @@ class RecruiterLinkSerializer(BaseSerializer):
     """
     Complete recruiter link serializer.
     """
-    full_url = serializers.SerializerMethodField()
     is_valid = serializers.BooleanField(read_only=True)
     is_expired = serializers.BooleanField(read_only=True)
     time_remaining = serializers.CharField(source='get_time_remaining', read_only=True)
@@ -25,7 +24,6 @@ class RecruiterLinkSerializer(BaseSerializer):
             'name',
             'description',
             'token',
-            'full_url',
             'expires_at',
             'is_active',
             'is_valid',
@@ -39,7 +37,6 @@ class RecruiterLinkSerializer(BaseSerializer):
         read_only_fields = [
             'id',
             'token',
-            'full_url',
             'is_valid',
             'is_expired',
             'time_remaining',
@@ -48,17 +45,6 @@ class RecruiterLinkSerializer(BaseSerializer):
             'created_at',
             'updated_at',
         ]
-    
-    def get_full_url(self, obj: RecruiterLink) -> str:
-        """Return the full URL with token."""
-        request = self.context.get('request')
-        if request:
-            # Get frontend base URL from settings or request
-            base_url = request.build_absolute_uri('/').rstrip('/')
-            # Remove /api from the URL if present
-            base_url = base_url.replace('/api', '')
-            return obj.get_full_url(base_url)
-        return f"https://your-portfolio.com?access={obj.token}"
 
 
 class RecruiterLinkCreateSerializer(serializers.ModelSerializer):
@@ -110,6 +96,7 @@ class RecruiterLinkListSerializer(serializers.ModelSerializer):
     Lightweight serializer for link lists.
     """
     is_valid = serializers.BooleanField(read_only=True)
+    is_expired = serializers.BooleanField(read_only=True)
     time_remaining = serializers.CharField(source='get_time_remaining', read_only=True)
     
     class Meta:
@@ -117,10 +104,25 @@ class RecruiterLinkListSerializer(serializers.ModelSerializer):
         fields = [
             'id',
             'name',
+            'description',
+            'token',
             'is_active',
             'is_valid',
-            'expires_at',
+            'is_expired',
             'time_remaining',
             'access_count',
+            'last_accessed_at',
             'created_at',
+            'updated_at',
+        ]
+        read_only_fields = [
+            'id',
+            'token',
+            'is_valid',
+            'is_expired',
+            'time_remaining',
+            'access_count',
+            'last_accessed_at',
+            'created_at',
+            'updated_at',
         ]

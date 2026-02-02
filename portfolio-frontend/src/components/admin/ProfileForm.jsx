@@ -9,7 +9,7 @@ import { Save } from 'lucide-react'
  * @param {Function} onSave - Callback(formData) pour sauvegarder
  * @param {boolean} saving - État de sauvegarde
  */
-export function ProfileForm({ profile, onSave, saving = false }) {
+export function ProfileForm({ profile, onSave, saving = false, errors = {} }) {
   const [formData, setFormData] = useState({
     professional_title: '',
     bio: '',
@@ -79,6 +79,7 @@ export function ProfileForm({ profile, onSave, saving = false }) {
             onChange={handleChange}
             placeholder="Ex: Développeur Full-Stack"
             helperText="Affiché en haut de votre profil public"
+            error={errors.professional_title}
           />
 
           <div>
@@ -96,6 +97,11 @@ export function ProfileForm({ profile, onSave, saving = false }) {
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
               Décrivez votre parcours, vos compétences et vos objectifs
             </p>
+            {errors.bio && (
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                {errors.bio}
+              </p>
+            )}
           </div>
 
           <Input
@@ -106,6 +112,7 @@ export function ProfileForm({ profile, onSave, saving = false }) {
             placeholder="Ex: Passionné par le développement web..."
             maxLength={150}
             helperText={`${formData.tagline.length}/150 caractères`}
+            error={errors.tagline}
           />
         </CardContent>
       </Card>
@@ -124,6 +131,7 @@ export function ProfileForm({ profile, onSave, saving = false }) {
             onChange={handleChange}
             placeholder="contact@example.com"
             helperText="Peut être différent de votre email de connexion"
+            error={errors.professional_email}
           />
 
           <Input
@@ -133,6 +141,7 @@ export function ProfileForm({ profile, onSave, saving = false }) {
             value={formData.phone}
             onChange={handleChange}
             placeholder="+33 6 12 34 56 78"
+            error={errors.phone}
           />
 
           <Input
@@ -141,6 +150,7 @@ export function ProfileForm({ profile, onSave, saving = false }) {
             value={formData.location}
             onChange={handleChange}
             placeholder="Ex: Paris, France"
+            error={errors.location}
           />
         </CardContent>
       </Card>
@@ -158,6 +168,7 @@ export function ProfileForm({ profile, onSave, saving = false }) {
             value={formData.website_url}
             onChange={handleChange}
             placeholder="https://exemple.com"
+            error={errors.website_url}
           />
 
           <Input
@@ -167,6 +178,7 @@ export function ProfileForm({ profile, onSave, saving = false }) {
             value={formData.github_url}
             onChange={handleChange}
             placeholder="https://github.com/username"
+            error={errors.github_url}
           />
 
           <Input
@@ -176,6 +188,7 @@ export function ProfileForm({ profile, onSave, saving = false }) {
             value={formData.linkedin_url}
             onChange={handleChange}
             placeholder="https://linkedin.com/in/username"
+            error={errors.linkedin_url}
           />
 
           <Input
@@ -185,6 +198,7 @@ export function ProfileForm({ profile, onSave, saving = false }) {
             value={formData.twitter_url}
             onChange={handleChange}
             placeholder="https://twitter.com/username"
+            error={errors.twitter_url}
           />
         </CardContent>
       </Card>
@@ -211,6 +225,11 @@ export function ProfileForm({ profile, onSave, saving = false }) {
               <option value="disponible_freelance">Disponible en freelance</option>
               <option value="disponible_projet">Disponible pour des projets</option>
             </select>
+            {errors.availability && (
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">
+                {errors.availability}
+              </p>
+            )}
           </div>
 
           {formData.availability !== 'non_disponible' && (
@@ -221,6 +240,7 @@ export function ProfileForm({ profile, onSave, saving = false }) {
               value={formData.availability_date}
               onChange={handleChange}
               helperText="À partir de quand êtes-vous disponible ?"
+              error={errors.availability_date}
             />
           )}
         </CardContent>

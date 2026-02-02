@@ -5,12 +5,13 @@ from rest_framework import viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from drf_spectacular.openapi import OpenApiParameter, OpenApiTypes
 
 from apps.core.permissions import IsOwner
 from apps.core.enums import Visibility
+from apps.core.utils import get_allowed_visibilities
 from .models import Project
 from .serializers import (
     ProjectSerializer,
@@ -62,7 +63,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
     - GET /api/projects/featured/ - List featured projects
     """
     permission_classes = [IsAuthenticated, IsOwner]
-    parser_classes = [MultiPartParser, FormParser]
+    parser_classes = [MultiPartParser, FormParser, JSONParser]
     
     def get_queryset(self):
         """Return projects for the authenticated user."""
@@ -98,7 +99,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
         
         projects = Project.objects.filter(
             user_id=user_id,
-            visibility=Visibility.PUBLIC
+            visibility__in=get_allowed_visibilities(request),
+            is_published=True,
         ).order_by('display_order', '-start_date')
         
         serializer = ProjectPublicSerializer(projects, many=True)
@@ -122,7 +124,8 @@ class ProjectViewSet(viewsets.ModelViewSet):
         
         projects = Project.objects.filter(
             user_id=user_id,
-            visibility=Visibility.PUBLIC,
+            visibility__in=get_allowed_visibilities(request),
+            is_published=True,
             is_featured=True
         ).order_by('display_order', '-start_date')
         
@@ -176,6 +179,23 @@ class ProjectViewSet(viewsets.ModelViewSet):
         return Response({
             'message': 'Statut mis en avant modifié',
             'is_featured': project.is_featured
+        }, status=status.HTTP_200_OK)
+    
+    @extend_schema(
+        parameters=[
+            OpenApiParameter('id', OpenApiTypes.UUID, OpenApiParameter.PATH, description='Project ID')
+        ]
+    )
+    @action(detail=True, methods=['post'])
+    def toggle_publish(self, request, pk=None):
+        """Toggle published status of a project."""
+        project = self.get_object()
+        project.is_published = not project.is_published
+        project.save(update_fields=['is_published'])
+
+        return Response({
+            'message': 'Statut de publication modifié',
+            'is_published': project.is_published
         }, status=status.HTTP_200_OK)
     
     @extend_schema(

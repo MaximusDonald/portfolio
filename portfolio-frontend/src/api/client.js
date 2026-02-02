@@ -18,6 +18,18 @@ const apiClient = axios.create({
 })
 
 /**
+ * Normalise une réponse "liste" API.
+ * Supporte:
+ * - liste brute: [...]
+ * - pagination DRF: { count, next, previous, results: [...] }
+ */
+export const unwrapListResponse = (data) => {
+  if (Array.isArray(data)) return data
+  if (data && Array.isArray(data.results)) return data.results
+  return []
+}
+
+/**
  * Récupérer le token d'accès depuis localStorage
  */
 const getAccessToken = () => {

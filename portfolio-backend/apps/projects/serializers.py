@@ -4,7 +4,7 @@ Serializers for projects
 from rest_framework import serializers
 
 from apps.core.serializers import BaseSerializer
-from apps.core.enums import Visibility
+from apps.core.enums import Visibility, ProjectStatus
 from .models import Project
 
 
@@ -49,6 +49,7 @@ class ProjectSerializer(BaseSerializer):
             'has_links',
             'cover_image',
             'is_featured',
+            'is_published',
             'visibility',
             'display_order',
             'created_at',
@@ -89,7 +90,7 @@ class ProjectSerializer(BaseSerializer):
             })
         
         # If status is "En_cours", end_date should be empty
-        if status == 'En_cours' and end_date:
+        if status == ProjectStatus.EN_COURS and end_date:
             raise serializers.ValidationError({
                 'end_date': 'La date de fin doit être vide pour un projet en cours'
             })
@@ -146,6 +147,7 @@ class ProjectCreateUpdateSerializer(serializers.ModelSerializer):
             'documentation_url',
             'cover_image',
             'is_featured',
+            'is_published',
             'visibility',
             'display_order',
         ]
@@ -169,6 +171,43 @@ class ProjectCreateUpdateSerializer(serializers.ModelSerializer):
         if len(value) < 50:
             raise serializers.ValidationError('La description détaillée doit contenir au moins 50 caractères.')
         return value
+
+    def validate(self, attrs):
+        """Validate project dates."""
+        start_date = attrs.get('start_date')
+        end_date = attrs.get('end_date')
+        status = attrs.get('status')
+
+        # Validate date format
+        if start_date and len(start_date) != 7:
+            raise serializers.ValidationError({'start_date': 'Format requis: YYYY-MM'})
+
+        if end_date and len(end_date) != 7:
+            raise serializers.ValidationError({'end_date': 'Format requis: YYYY-MM'})
+
+        # Check that end_date is after start_date
+        if end_date and start_date and end_date < start_date:
+            raise serializers.ValidationError({'end_date': 'La date de fin doit être postérieure à la date de début'})
+
+        # If status is "En_cours", end_date should be empty
+        if status == ProjectStatus.EN_COURS and end_date:
+            raise serializers.ValidationError({'end_date': 'La date de fin doit être vide pour un projet en cours'})
+
+        return attrs
+
+    def to_internal_value(self, data):
+        """Convert empty strings to None for optional specific fields."""
+        new_data = data.copy()
+        
+        # Handle optional integer fields
+        if 'team_size' in new_data and new_data['team_size'] == '':
+            new_data['team_size'] = None
+        
+        # Handle display_order if empty
+        if 'display_order' in new_data and new_data['display_order'] == '':
+            new_data['display_order'] = 0
+            
+        return super().to_internal_value(new_data)
 
 
 class ProjectPublicSerializer(serializers.ModelSerializer):
@@ -232,5 +271,6 @@ class ProjectListSerializer(serializers.ModelSerializer):
             'demo_url',
             'cover_image',
             'is_featured',
+            'is_published',
             'visibility',
         ]

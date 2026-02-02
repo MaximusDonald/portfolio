@@ -15,6 +15,7 @@ export function Profile() {
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState(null)
+  const [fieldErrors, setFieldErrors] = useState({})
   const [successMessage, setSuccessMessage] = useState('')
 
   // Charger le profil au montage
@@ -41,18 +42,24 @@ export function Profile() {
     try {
       setSaving(true)
       setError(null)
+      setFieldErrors({})
       setSuccessMessage('')
 
       const updatedProfile = await profileAPI.updateMyProfile(formData)
       setProfile(updatedProfile)
-      
+
       setSuccessMessage('Profil mis à jour avec succès !')
-      
+
       // Masquer le message après 3 secondes
       setTimeout(() => setSuccessMessage(''), 3000)
     } catch (err) {
       console.error('Erreur lors de la sauvegarde:', err)
-      setError(err.response?.data?.detail || 'Erreur lors de la sauvegarde')
+      if (err.response?.status === 400 && err.response?.data) {
+        setFieldErrors(err.response.data)
+        setError('Veuillez corriger les erreurs dans le formulaire')
+      } else {
+        setError(err.response?.data?.detail || 'Erreur lors de la sauvegarde')
+      }
     } finally {
       setSaving(false)
     }
@@ -66,10 +73,10 @@ export function Profile() {
       setSuccessMessage('')
 
       const response = await profileAPI.uploadPhoto(file)
-      
+
       // Recharger le profil pour avoir la nouvelle URL
       await fetchProfile()
-      
+
       setSuccessMessage('Photo mise à jour avec succès !')
       setTimeout(() => setSuccessMessage(''), 3000)
     } catch (err) {
@@ -90,10 +97,10 @@ export function Profile() {
       setSuccessMessage('')
 
       await profileAPI.deletePhoto()
-      
+
       // Recharger le profil
       await fetchProfile()
-      
+
       setSuccessMessage('Photo supprimée avec succès !')
       setTimeout(() => setSuccessMessage(''), 3000)
     } catch (err) {
@@ -199,6 +206,7 @@ export function Profile() {
         profile={profile}
         onSave={handleSave}
         saving={saving}
+        errors={fieldErrors}
       />
     </AdminLayout>
   )

@@ -104,6 +104,12 @@ class Experience(BaseModel, VisibilityMixin, OwnedModel):
         help_text='Ordre d\'affichage (0 = premier)'
     )
     
+    is_published = models.BooleanField(
+        default=True,
+        verbose_name='Publié',
+        help_text='Si désactivé, le contenu reste en brouillon et n\'apparaît pas publiquement.'
+    )
+    
     class Meta:
         verbose_name = 'Expérience professionnelle'
         verbose_name_plural = 'Expériences professionnelles'
@@ -241,6 +247,12 @@ class Training(BaseModel, VisibilityMixin, OwnedModel):
         default=0,
         verbose_name='Ordre d\'affichage',
         help_text='Ordre d\'affichage (0 = premier)'
+    )
+    
+    is_published = models.BooleanField(
+        default=True,
+        verbose_name='Publié',
+        help_text='Si désactivé, le contenu reste en brouillon et n\'apparaît pas publiquement.'
     )
     
     class Meta:

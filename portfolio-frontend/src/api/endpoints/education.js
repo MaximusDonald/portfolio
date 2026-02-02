@@ -1,12 +1,10 @@
-import apiClient from '../client'
+// src/api/education.js
+import apiClient, { unwrapListResponse } from '../client'
 
-/**
- * Endpoints pour les diplômes
- */
 export const diplomasAPI = {
   getAll: async () => {
     const response = await apiClient.get('/education/diplomas/')
-    return response.data
+    return unwrapListResponse(response.data)
   },
 
   getById: async (id) => {
@@ -25,32 +23,36 @@ export const diplomasAPI = {
   },
 
   delete: async (id) => {
-    const response = await apiClient.delete(`/education/diplomas/${id}/`)
-    return response.data
+    await apiClient.delete(`/education/diplomas/${id}/`)
+    // pas besoin de return data ici
   },
 
-  getPublic: async (userId) => {
+  getPublic: async (userId, params = {}) => {
     const response = await apiClient.get('/education/diplomas/public/', {
-      params: { user_id: userId }
+      params: { user_id: userId, ...params }
     })
-    return response.data
+    return unwrapListResponse(response.data)
   },
 
   reorder: async (diplomas) => {
-    const response = await apiClient.post('/education/diplomas/reorder/', {
-      diplomas
-    })
+    const response = await apiClient.post('/education/diplomas/reorder/', { diplomas })
+    return response.data
+  },
+
+  /**
+   * Basculer le statut "publié"
+   * POST /api/education/diplomas/{id}/toggle_publish/
+   */
+  togglePublish: async (id) => {
+    const response = await apiClient.post(`/education/diplomas/${id}/toggle_publish/`)
     return response.data
   },
 }
 
-/**
- * Endpoints pour les certifications
- */
 export const certificationsAPI = {
   getAll: async () => {
     const response = await apiClient.get('/education/certifications/')
-    return response.data
+    return unwrapListResponse(response.data)
   },
 
   getById: async (id) => {
@@ -69,21 +71,28 @@ export const certificationsAPI = {
   },
 
   delete: async (id) => {
-    const response = await apiClient.delete(`/education/certifications/${id}/`)
-    return response.data
+    await apiClient.delete(`/education/certifications/${id}/`)
+    // pas besoin de return data ici
   },
 
-  getPublic: async (userId) => {
+  getPublic: async (userId, params = {}) => {
     const response = await apiClient.get('/education/certifications/public/', {
-      params: { user_id: userId }
+      params: { user_id: userId, ...params }
     })
-    return response.data
+    return unwrapListResponse(response.data)
   },
 
   reorder: async (certifications) => {
-    const response = await apiClient.post('/education/certifications/reorder/', {
-      certifications
-    })
+    const response = await apiClient.post('/education/certifications/reorder/', { certifications })
+    return response.data
+  },
+
+  /**
+   * Basculer le statut "publié"
+   * POST /api/education/certifications/{id}/toggle_publish/
+   */
+  togglePublish: async (id) => {
+    const response = await apiClient.post(`/education/certifications/${id}/toggle_publish/`)
     return response.data
   },
 }

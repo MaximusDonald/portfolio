@@ -19,6 +19,7 @@ class ProfileSerializer(BaseSerializer):
     user_full_name = serializers.CharField(source='user.get_full_name', read_only=True)
     display_email = serializers.CharField(source='get_display_email', read_only=True)
     social_links = serializers.DictField(source='get_social_links', read_only=True)
+    portfolio_slug = serializers.CharField(required=False, allow_blank=True)
     
     class Meta:
         model = Profile
@@ -27,6 +28,7 @@ class ProfileSerializer(BaseSerializer):
             'id',
             'user_email',
             'user_full_name',
+            'portfolio_slug',
             
             # Personal info
             'photo',
@@ -55,10 +57,23 @@ class ProfileSerializer(BaseSerializer):
             'show_email',
             'show_phone',
             'show_location',
+            'public_template',
             
             # Metadata
             'is_profile_complete',
             'profile_views',
+            
+            # Custom Empty Messages
+            'empty_about_text',
+            'empty_skills_text',
+            'empty_experience_text',
+            'empty_projects_text',
+            'empty_education_text',
+
+            # Custom Traits
+            'trait_1_title', 'trait_1_description',
+            'trait_2_title', 'trait_2_description',
+            'trait_3_title', 'trait_3_description',
             
             # Timestamps
             'created_at',
@@ -101,16 +116,23 @@ class PublicProfileSerializer(serializers.ModelSerializer):
     Public profile serializer (filtered based on privacy settings).
     """
     user_full_name = serializers.CharField(source='user.get_full_name', read_only=True)
+    user_id = serializers.CharField(source='user.id', read_only=True)
     email = serializers.SerializerMethodField()
     phone_display = serializers.SerializerMethodField()
     location_display = serializers.SerializerMethodField()
     social_links = serializers.DictField(source='get_social_links', read_only=True)
+    portfolio_slug = serializers.CharField(read_only=True)
+    public_url = serializers.CharField(read_only=True)
+    public_template = serializers.CharField(read_only=True)
     
     class Meta:
         model = Profile
         fields = [
             'id',
+            'user_id',
             'user_full_name',
+            'portfolio_slug',
+            'public_url',
             'photo',
             'professional_title',
             'bio',
@@ -121,6 +143,27 @@ class PublicProfileSerializer(serializers.ModelSerializer):
             'social_links',
             'availability',
             'availability_date',
+            'public_template',
+            
+            # Fields needed by the frontend UI
+            'professional_email',
+            'phone',
+            'location',
+            'show_email',
+            'show_phone',
+            'show_location',
+
+            # Custom Empty Messages
+            'empty_about_text',
+            'empty_skills_text',
+            'empty_experience_text',
+            'empty_projects_text',
+            'empty_education_text',
+
+            # Custom Traits
+            'trait_1_title', 'trait_1_description',
+            'trait_2_title', 'trait_2_description',
+            'trait_3_title', 'trait_3_description',
         ]
     
     def get_email(self, obj: Profile) -> Optional[str]:
@@ -150,6 +193,7 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Profile
         fields = [
+            'portfolio_slug',
             'photo',
             'professional_title',
             'bio',
@@ -166,8 +210,26 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
             'show_email',
             'show_phone',
             'show_location',
+            'public_template',
         ]
     
+    def to_internal_value(self, data):
+        # Convert empty strings to None for DateFields
+        # We work on a copy to avoid mutating the original data
+        new_data = data.copy()
+        
+        # Date fields typically raise validation error on empty string
+        if 'availability_date' in new_data and new_data['availability_date'] == '':
+            new_data['availability_date'] = None
+            
+        return super().to_internal_value(new_data)
+        
+    def validate_phone(self, value):
+        """Allow empty phone number despite regex validator."""
+        if not value:
+            return ""
+        return value
+
     def validate_professional_title(self, value):
         """Validate professional title length."""
         if value and len(value) < 5:
@@ -183,3 +245,8 @@ class ProfileUpdateSerializer(serializers.ModelSerializer):
                 'La biographie doit contenir au moins 50 caractères.'
             )
         return value
+        
+    def validate(self, attrs):
+        """Debug validation errors."""
+        # This method is called after individual field validation
+        return attrs

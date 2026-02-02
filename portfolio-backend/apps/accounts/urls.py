@@ -10,7 +10,8 @@ from .views import (
     logout_view,
     UserProfileView,
     ChangePasswordView,
-    verify_token_view
+    verify_token_view,
+    delete_account_view
 )
 
 app_name = 'accounts'
@@ -26,4 +27,5 @@ urlpatterns = [
     # User profile endpoints
     path('profile/', UserProfileView.as_view(), name='profile'),
     path('change-password/', ChangePasswordView.as_view(), name='change_password'),
+    path('delete-account/', delete_account_view, name='delete_account'),
 ]

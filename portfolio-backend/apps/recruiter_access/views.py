@@ -115,13 +115,35 @@ class RecruiterLinkViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        from .utils import validate_recruiter_token
-        
-        is_valid = validate_recruiter_token(token)
-        
-        return Response({
-            'valid': is_valid
-        }, status=status.HTTP_200_OK)
+        try:
+            link = RecruiterLink.objects.get(token=token)
+            
+            if not link.is_active:
+                return Response({
+                    'valid': False,
+                    'message': 'Ce lien a été désactivé.'
+                }, status=status.HTTP_200_OK)
+                
+            if link.is_expired():
+                return Response({
+                    'valid': False,
+                    'expired': True,
+                    'message': 'Ce lien a expiré.'
+                }, status=status.HTTP_200_OK)
+            
+            # Increment access counter
+            link.increment_access()
+            
+            return Response({
+                'valid': True,
+                'user_id': str(link.user.id)
+            }, status=status.HTTP_200_OK)
+            
+        except RecruiterLink.DoesNotExist:
+            return Response({
+                'valid': False,
+                'message': 'Lien invalide.'
+            }, status=status.HTTP_200_OK)
     
     @action(detail=False, methods=['get'])
     def active(self, request):

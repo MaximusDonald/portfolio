@@ -71,3 +71,26 @@ def validate_file_size(file, max_size_mb):
     """
     max_size_bytes = max_size_mb * 1024 * 1024
     return file.size <= max_size_bytes
+
+
+def get_allowed_visibilities(request):
+    """
+    Return list of allowed visibilities based on request.
+    Always includes PUBLIC.
+    Includes RECRUTEUR if a valid token is provided in 'access' query param.
+    """
+    from apps.core.enums import Visibility
+    
+    visibilities = [Visibility.PUBLIC]
+    
+    token = request.query_params.get('access')
+    if token:
+        try:
+            # Import inside function to avoid circular imports
+            from apps.recruiter_access.utils import validate_recruiter_token
+            if validate_recruiter_token(token):
+                visibilities.append(Visibility.RECRUTEUR)
+        except ImportError:
+            pass
+            
+    return visibilities

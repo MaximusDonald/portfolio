@@ -114,9 +114,13 @@ class RecruiterLink(BaseModel):
     
     def increment_access(self):
         """Increment access counter and update last access time."""
-        self.access_count += 1
-        self.last_accessed_at = timezone.now()
-        self.save(update_fields=['access_count', 'last_accessed_at'])
+        if not self.last_accessed_at:
+            self.last_accessed_at = timezone.now()
+            self.save(update_fields=['last_accessed_at'])
+        if timezone.now() > self.last_accessed_at + timedelta(seconds=10): 
+            self.access_count += 1
+            self.last_accessed_at = timezone.now()
+            self.save(update_fields=['access_count', 'last_accessed_at'])
     
     def get_full_url(self, base_url):
         """

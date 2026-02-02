@@ -1,21 +1,28 @@
-import apiClient from '../client'
+import apiClient, { unwrapListResponse } from '../client'
 
 /**
- * Endpoints pour la gestion des liens recruteur
+ * Endpoints pour les liens recruteurs
+ * API Backend: /api/recruiter-access/
  */
 export const recruiterAPI = {
   /**
-   * Lister tous mes liens recruteur
-   * GET /api/recruiter-access/
+   * Récupérer tous les liens recruteurs
    */
   getAll: async () => {
     const response = await apiClient.get('/recruiter-access/')
-    return response.data
+    return unwrapListResponse(response.data)
   },
 
   /**
-   * Récupérer un lien par ID
-   * GET /api/recruiter-access/{id}/
+   * Récupérer uniquement les liens actifs
+   */
+  getActive: async () => {
+    const response = await apiClient.get('/recruiter-access/active/')
+    return unwrapListResponse(response.data)
+  },
+
+  /**
+   * Récupérer un lien par son ID
    */
   getById: async (id) => {
     const response = await apiClient.get(`/recruiter-access/${id}/`)
@@ -24,7 +31,7 @@ export const recruiterAPI = {
 
   /**
    * Créer un nouveau lien recruteur
-   * POST /api/recruiter-access/
+   * @param {Object} data - { name, description?, duration_hours }
    */
   create: async (data) => {
     const response = await apiClient.post('/recruiter-access/', data)
@@ -32,8 +39,7 @@ export const recruiterAPI = {
   },
 
   /**
-   * Mettre à jour un lien
-   * PATCH /api/recruiter-access/{id}/
+   * Mettre à jour un lien recruteur
    */
   update: async (id, data) => {
     const response = await apiClient.patch(`/recruiter-access/${id}/`, data)
@@ -41,8 +47,7 @@ export const recruiterAPI = {
   },
 
   /**
-   * Supprimer un lien
-   * DELETE /api/recruiter-access/{id}/
+   * Supprimer un lien recruteur
    */
   delete: async (id) => {
     const response = await apiClient.delete(`/recruiter-access/${id}/`)
@@ -51,7 +56,6 @@ export const recruiterAPI = {
 
   /**
    * Révoquer un lien (le désactiver)
-   * POST /api/recruiter-access/{id}/revoke/
    */
   revoke: async (id) => {
     const response = await apiClient.post(`/recruiter-access/${id}/revoke/`)
@@ -59,8 +63,7 @@ export const recruiterAPI = {
   },
 
   /**
-   * Réactiver un lien
-   * POST /api/recruiter-access/{id}/activate/
+   * Réactiver un lien révoqué (si non expiré)
    */
   activate: async (id) => {
     const response = await apiClient.post(`/recruiter-access/${id}/activate/`)
@@ -68,31 +71,18 @@ export const recruiterAPI = {
   },
 
   /**
-   * Valider un token recruteur (endpoint public)
-   * POST /api/recruiter-access/validate/
-   */
-  validateToken: async (token) => {
-    const response = await apiClient.post('/recruiter-access/validate/', {
-      token
-    })
-    return response.data
-  },
-
-  /**
-   * Récupérer uniquement les liens actifs
-   * GET /api/recruiter-access/active/
-   */
-  getActive: async () => {
-    const response = await apiClient.get('/recruiter-access/active/')
-    return response.data
-  },
-
-  /**
    * Récupérer les statistiques des liens
-   * GET /api/recruiter-access/statistics/
    */
-  getStatistics: async () => {
+  statistics: async () => {
     const response = await apiClient.get('/recruiter-access/statistics/')
     return response.data
   },
+
+  /**
+   * Valider un token recruteur (endpoint public)
+   */
+  validateToken: async (token) => {
+    const response = await apiClient.post('/recruiter-access/validate/', { token })
+    return response.data
+  }
 }
